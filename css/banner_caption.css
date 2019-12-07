@@ -1,0 +1,17 @@
+﻿@media (max-width: 400px) {
+     #caption1 {
+        display: none;
+    }
+    #caption2 {
+        display: block;
+    }
+}
+
+@media (min-width: 400px) {
+    /*#caption1 {
+        display: block;
+    }*/
+     #caption2 {
+        display: none;
+    }
+}
