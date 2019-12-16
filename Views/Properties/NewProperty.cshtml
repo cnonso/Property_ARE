@@ -1,0 +1,249 @@
+﻿@model PropertyManagerWeb.Models.MultipleModels
+
+@{
+    ViewBag.Title = "Property : New Property";
+}
+
+<script>
+    //Client-side image upload preview
+    var loadFile = function (event) {
+        var output = document.getElementById('output1');
+        output.src = URL.createObjectURL(event.target.files[0]);
+
+        var instruct = document.getElementById('instruct');
+        instruct.style.display = 'none';
+    };
+
+    var loadFile2 = function (event) {
+        var output2 = document.getElementById('output2');
+        output2.src = URL.createObjectURL(event.target.files[0]);
+
+        var instruct2 = document.getElementById('instruct2');
+        instruct2.style.display = 'none';
+    };
+    var loadFile3 = function (event) {
+        var output3 = document.getElementById('output3');
+        output3.src = URL.createObjectURL(event.target.files[0]);
+
+        var instruct3 = document.getElementById('instruct3');
+        instruct3.style.display = 'none';
+    };
+    var loadFile4 = function (event) {
+        var output4 = document.getElementById('output4');
+        output4.src = URL.createObjectURL(event.target.files[0]);
+
+        var instruct4 = document.getElementById('instruct4');
+        instruct4.style.display = 'none';
+    };
+
+</script>
+<div class="rle_contact_wrapper rle_toppadder90 rle_bottompadder90">
+    <div class="container">
+        @using (Html.BeginForm("NewProperty", "Properties", FormMethod.Post, new { @name = "propertyProfile", role = "form", enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="row" style="margin-top:-50px">
+
+                <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">
+                    <div class="rle_contact_form">
+                        <div class="row">
+                            <div class="col-md-2 col-sm-2 col-xs-12">
+                                <label>Category</label>
+                                <select name="Category" onchange="toggleDisplay(this.value);" class="form-control" style="margin-bottom:20px; height:50px; border-radius:0px">
+                                    <option value="For Rent">For Rent</option>
+                                    <option value="For Sale">For Sale</option>
+                                </select>
+                                <script>
+                                    function toggleDisplay(value) {
+                                        if(value == "For Rent")
+                                        {
+                                            document.getElementById('perYr').style.display = "inline-block";
+                                        }
+                                        else if (value == "For Sale") {
+                                            document.getElementById('perYr').style.display = "none";
+                                        }
+                                    }
+                                </script>
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                <label>Title</label>
+                                @Html.TextBoxFor(m => m.PropertyViewModel.Name, new { @placeholder = "Property Name", @class = "form-control", @style = "margin-bottom:20px; height:50px; border-radius:0px" })
+                            </div>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <label>Property Type</label>
+                                @Html.DropDownList("PropertyTypes", (IEnumerable<SelectListItem>)ViewBag.PropertyTypes, new { @id = "", @class = "form-control", @style = "margin-bottom:20px; height:50px; border-radius:0px" })
+                                @Html.ValidationMessageFor(model => model.PropertyViewModel.PropertyType, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <label>Description</label>
+                                @Html.TextAreaFor(m => m.PropertyViewModel.PlainDescription, new { @rows = 5, @placeholder = "Address", @class = "form-control", @style = "margin-bottom:20px; border-radius:0px" })
+                                @Html.ValidationMessageFor(model => model.PropertyViewModel.PlainDescription, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <label>Address</label>
+                                @Html.TextAreaFor(m => m.PropertyViewModel.Address, new { @rows = 5, @placeholder = "Address", @class = "form-control", @style = "margin-bottom:20px; border-radius:0px" })
+                                @Html.ValidationMessageFor(model => model.PropertyViewModel.Address, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-md-3 col-sm-3 col-xs-12">
+                                <label>Price <i id="perYr" style="color:red; display:inline-block"> (per year)</i></label>
+                                @Html.TextBoxFor(m => m.PropertyViewModel.RentAmount, new { @placeholder = "Price", @class = "form-control", @style = "margin-bottom:20px; height:50px; border-radius:0px" })
+                                @Html.ValidationMessageFor(model => model.PropertyViewModel.RentAmount, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-md-3 col-sm-3 col-xs-12">
+                                <label>Town </label>
+                                @Html.DropDownList("Locations", (IEnumerable<SelectListItem>)ViewBag.Locations, new { @id = "", @class = "form-control", @style = "margin-bottom:20px; height:50px; border-radius:0px" })
+                            </div>
+                            <div class="col-md-2 col-sm-2 col-xs-12">
+                                <label>Beds </label>
+                                @Html.DropDownList("Beds", null, new { @id = "", @class = "form-control", @style = "margin-bottom:20px; height:50px; border-radius:0px" })
+                            </div>
+                            <div class="col-md-2 col-sm-2 col-xs-12">
+                                <label>Baths </label>
+                                @Html.DropDownList("Baths", null, new { @id = "", @class = "form-control", @style = "margin-bottom:20px; height:50px; border-radius:0px" })
+                            </div>
+                            <div class="col-md-2 col-sm-2 col-xs-12">
+                                <label>Parking Lot </label>
+                                <select name="ParkingLot" class="form-control" style="margin-bottom:20px; height:50px; border-radius:0px">
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                    <div class="rle_contact_form">
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                <label>Property Image</label>
+                                <label class="custom-file-upload">
+                                    <small id="instruct">Click to Upload a Profile Image <span class="glyphicon glyphicon-camera"></span></small>
+                                    <img class="img-responsive center-block" id="output1" width="300" height="300" />
+                                    @Html.TextBoxFor(m => m.PropertyViewModel.ImageMain, new { @type = "file", accept = "image/*", onchange = "loadFile(event)" })
+                                </label>
+                            </div>
+                            <div class="col-md-6 col-sm-6 col-xs-12" style="display:none">
+                                <label>Profile Image</label>
+                                <label class="custom-file-upload">
+                                    <small id="instruct2">Click to Upload a Profile Image <span class="glyphicon glyphicon-camera"></span></small>
+                                    <img class="img-responsive center-block" id="output2" width="300" height="300" />
+                                    @Html.TextBoxFor(m => m.PropertyViewModel.ImageMain, new { @type = "file", accept = "image/*", onchange = "loadFile2(event)" })
+                                </label>
+                            </div>
+                        </div>
+                        <div class="row" style="display:none">
+                            <div class="col-md-6 col-sm-3 col-xs-12">
+                                <label>Profile Image</label>
+                                <label class="custom-file-upload">
+                                    <small id="instruct3">Click to Upload a Profile Image <span class="glyphicon glyphicon-camera"></span></small>
+                                    <img class="img-responsive center-block" id="output3" width="300" height="300" />
+                                    @Html.TextBoxFor(m => m.PropertyViewModel.ImageMain, new { @type = "file", accept = "image/*", onchange = "loadFile3(event)" })
+                                </label>
+                            </div>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <label>Profile Image</label>
+                                <label class="custom-file-upload">
+                                    <small id="instruct4">Click to Upload a Profile Image <span class="glyphicon glyphicon-camera"></span></small>
+                                    <img class="img-responsive center-block" id="output4" width="300" height="300" />
+                                    @Html.TextBoxFor(m => m.PropertyViewModel.ImageMain, new { @type = "file", accept = "image/*", onchange = "loadFile4(event)" })
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="rle_contact_form">
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                <label style="margin-top:50px">Select Location from Map</label>
+                                <div id="googleMap" style="height:350px; border:thin; padding-left:20px"></div>
+                                <input type="hidden" id="coordinateLat" name="CoordinateLat" placeholder="0.00000...">
+                                <input style="margin-top:20px" type="hidden" id="coordinateLong" name="CoordinateLong" placeholder="0.00000...">
+
+                                <script>
+                                    var gmarkers = [];
+                                    function myMap() {
+                                        var mapCanvas = document.getElementById("googleMap");
+                                        var myCenter = new google.maps.LatLng(6.221107955334719, 7.082233428955078);
+                                        var mapOptions = { center: myCenter, zoom: 12, mapTypeId: google.maps.MapTypeId.ROADMAP };
+                                        var map = new google.maps.Map(mapCanvas, mapOptions);
+                                        google.maps.event.addListener(map, 'click', function (event) {
+                                            placeMarker(map, event.latLng);
+                                        });
+                                    }
+
+                                    function placeMarker(map, location) {
+                                        var marker = new google.maps.Marker({
+                                            position: location,
+                                            map: map
+                                        });
+
+                                        var infowindow = new google.maps.InfoWindow({
+                                            content: 'Latitude: ' + location.lat() + '<br>Longitude: ' + location.lng()
+                                        });
+                                        infowindow.open(map, marker);
+
+                                        // Push every newly created marker into the array:
+                                        gmarkers.push(marker);
+                                        marker.addListener("click", function () {
+                                            //marker.setMap(null);
+                                            for (i = 0; i < gmarkers.length; i++) {
+                                                gmarkers[i].setMap(null);
+                                            }
+                                            document.propertyProfile.CoordinateLat.value = "";
+                                            document.propertyProfile.CoordinateLong.value = "";
+                                        });
+
+                                        document.propertyProfile.CoordinateLat.value = location.lat();
+                                        document.propertyProfile.CoordinateLong.value = location.lng()
+                                    }
+
+                                    function removeMarkers() {
+                                        for (i = 0; i < gmarkers.length; i++) {
+                                            gmarkers[i].setMap(null);
+                                        }
+                                    }
+                                </script>
+                                <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCmlb220Er3NeKZBpMRdQH07y0LgKQYbWc&callback=myMap"></script>
+
+                            </div>
+                            <div class="col-lg-12">
+                                <button style=" float:right; margin-top:20px" type="submit" class="rle_btn">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    input[type="file"] {
+        display: none;
+    }
+
+    .custom-file-upload {
+        border: 1px solid #ccc;
+        display: inline-block;
+        padding: 0px 12px;
+        cursor: pointer;
+        width: 100%;
+        height: 300px;
+    }
+</style>
+@*<div>
+        @Html.ActionLink("Back to List", "Index")
+    </div>
+
+    @section Scripts {
+        @Scripts.Render("~/bundles/jqueryval")
+    }*@
+
+@section Scripts {
+}

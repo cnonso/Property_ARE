@@ -1,0 +1,938 @@
+﻿@model PropertyManagerWeb.Models.MultipleModels
+@{
+    Layout = null;
+    ViewBag.Title = "Home Page";
+}
+@using Microsoft.AspNet.Identity;
+
+<!DOCTYPE html>
+<!--
+Template Name: Real Estate
+Version: 1.0.0
+-->
+<!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+<!--<![endif]-->
+<head>
+    <meta charset="utf-8" />
+    <title>Anambra Real Estate</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta name="description" content="Real Estate" />
+    <meta name="keywords" content="Real Estate, Property template, Real Estate template, rent, sale, buy" />
+    <meta name="author" content="" />
+    <meta name="MobileOptimized" content="320" />
+    <!--srart theme style -->
+    <link href="~/css/bootstrap.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="~/css/font-awesome.css" />
+    <link rel="stylesheet" type="text/css" href="~/css/fonts.css" />
+    <link rel="stylesheet" type="text/css" href="~/css/owl.carousel.css" />
+    <link rel="stylesheet" type="text/css" href="~/css/owl.theme.default.css" />
+    <link rel="stylesheet" type="text/css" href="~/css/jquery-ui.css" />
+    <link rel="stylesheet" type="text/css" href="~/css/style.css" />
+    <!-- favicon links -->
+    <link rel="shortcut icon" type="image/png" href="~/images/header/favicon.ico" />
+</head>
+<body>
+    <div class="rle_banner_wrapper">
+        <div class="rle_header_wrapper">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                        <div class="rle_logo">
+                            <a href="#"><img src="~/images/icon/a_logo_white_fit.png" alt="Logo" title="Logo"></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
+                        <button class="rle_menu_btn"><i class="fa fa-bars" aria-hidden="true"></i></button>
+                        <div class="rle_main_menu_wrapper" style="width:80% ">
+                            <div class="rle_main_menu">
+
+                                <ul>
+                                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                                    <li style="margin-left:-15px">
+                                        @Html.ActionLink("Property Listing", "Property Listing", "Properties")
+                                        <ul class="sub-menu">
+                                            <li>@Html.ActionLink("Regular", "Property Listing", "Properties")</li>
+                                            <li>@Html.ActionLink("Featured", "Featured-Property-Listing", "Properties")</li>
+                                        </ul>
+                                    </li>
+                                    <li style="margin-left:-15px">@Html.ActionLink("Verified Agents", "Verified Agents", "Properties")</li>
+                                    @if (!Request.IsAuthenticated)
+                                    {
+                                        <li style="margin-left:-15px">@Html.ActionLink("Blog", "Blog Posts", "Home")</li>
+                                    }
+                                    @{
+                                        string userID = User.Identity.GetUserId();
+                                        string userType = new PropertyManagerWeb.Models.DB().ReadData("Select UserType From AspNetUsers where Id = '" + userID + "'");
+                                        if (userType.Trim() == "Landlord")
+                                        {
+                                            <li style="margin-left:-15px">@Html.ActionLink("Blog", "Blog Posts", "Home")</li>
+                                            <li style="margin-left:-15px">
+                                                <a href="#">My Account</a>
+                                                <ul class="sub-menu">
+                                                    <li>@Html.ActionLink("Change Password", "ChangePassword", "Manage")</li>
+                                                    <li>@Html.ActionLink("Update Profile", "Edit", "Landlords")</li>
+                                                    <li>@Html.ActionLink("My Listing", "My-Property-Listing", "Properties")</li>
+                                                    <li>@Html.ActionLink("My Messages", "My-Messages", "Landlords")</li>
+                                                </ul>
+                                            </li>
+                                        }
+                                        if (userType.Trim() == "Admin")
+                                        {
+                                            <li style="margin-left:-15px">@Html.ActionLink("All Agents", "Index", "Landlords")</li>
+                                            <li style="margin-left:-15px">
+                                                @Html.ActionLink("Blogs", "Blog Posts", "Home")
+                                                <ul class="sub-menu">
+                                                    <li>@Html.ActionLink("Create Topic", "Create Blog", "Home")</li>
+                                                </ul>
+                                            </li>
+                                        }
+                                        if (Request.IsAuthenticated)
+                                        {
+                                            using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { @id = "logoutForm_", @class = "navbar-right_" }))
+                                            {
+                                                @Html.AntiForgeryToken()
+
+                                            }
+                                        }
+
+                                        @*@Html.Partial("_LoginPartial")*@
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                        @if (!Request.IsAuthenticated)
+                        {
+                            <div class="rle_signin">
+                                @Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { @class = "rle_btn", @id = "reg_button", @style = "background-color:orange; border-color:orange" })
+                                @Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { @class = "rle_btn", @id = "login_button" })
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="rle_signin">
+                                @Html.ActionLink("Post Property", "NewProperty", "Properties", routeValues: null, htmlAttributes: new { @class = "rle_btn", @id = "myAccount_button", @style = "background-color:orange; border-color:orange;", @onmouseover = "document.getElementById('myAccount_button').style.color = 'orange'", @onmouseout = "document.getElementById('myAccount_button').style.color = 'white'" })
+                                @*<a class="rle_btn" id="myAccount_button" style="background-color:orange; border-color:orange;" onmouseover="document.getElementById('myAccount_button').style.color = 'orange'" onmouseout="document.getElementById('myAccount_button').style.color = 'white'" href="@Url.Action("NewProperty", "Properties")">Enlist Property</a>*@
+                                <a class="rle_btn" id="login_button" href="javascript:document.getElementById('logoutForm_').submit()">Log off</a>
+                            </div>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="rle_banner_text" id="caption3">
+
+                        <div id="caption1" style="margin-top:-140px;">
+                          
+                            <link href="~/css/banner_caption.css" rel="stylesheet" />
+                        </div>
+                        <div class="rle_header_wrapper" id="caption2">
+                            <h1>Anambra <span>real estate</span></h1>
+                            <p>Exclusive property management specialists</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Tab Form Section start -->
+    <div class="rle_searchform_wrapper">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="rle_searchform_tabs">
+                        <!-- Nav tabs -->
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li role="presentation" class="active"><a href="#rent" aria-controls="rent" role="tab" data-toggle="tab">rent</a></li>
+                            <li role="presentation"><a href="#buy" aria-controls="buy" role="tab" data-toggle="tab">buy</a></li>
+                        </ul>
+                        <!-- Tab panes -->
+                        <div class="tab-content">
+                            <div role="tabpanel" class="tab-pane fade" id="buy">
+                                <div class="row">
+                                    @using (Html.BeginForm("SearchForSale", "Properties", FormMethod.Post, new { id = "forSale" }))
+                                    {
+                                        <div class="col-lg-10 col-md-10 col-sm-9 col-xs-12">
+                                            <div class="rle_searchform_box">
+                                                <div class="col-lg-6 col-md-6 col-sm-4 col-xs-12">
+                                                    <input type="search" placeholder="Street, town & landmark">
+                                                </div>
+                                                <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                                                    @Html.DropDownList("Locations2", (IEnumerable<SelectListItem>)ViewBag.Locations, new { id = "ddlLocations", @class = "form-control" })
+                                                </div>
+
+                                                <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                                                    @Html.DropDownList("PropertyTypes2", (IEnumerable<SelectListItem>)ViewBag.PropertyTypes, new { id = "ddlUnits", @class = "form-control" })
+
+                                                </div>
+                                                <div class="col-lg-2 col-md-2 col-sm-4 col-xs-12">
+                                                    @Html.DropDownList("Beds2", (IEnumerable<SelectListItem>)ViewBag.Beds, new { @id = "country19", @class = "form-control" })
+                                                </div>
+                                                <div class="col-lg-2 col-md-2 col-sm-4 col-xs-12">
+                                                    @Html.DropDownList("Baths2", (IEnumerable<SelectListItem>)ViewBag.Baths, new { @id = "country19", @class = "form-control" })
+                                                </div>
+                                                <div class="col-lg-2 col-md-2 col-sm-3 col-xs-12">
+                                                    <select name="parkingLot">
+                                                        <option>Parking Lot</option>
+                                                        <option value="Yes">Yes</option>
+                                                        <option value="No">No</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-lg-2 col-md-2 col-sm-3 col-xs-12">
+                                                    @Html.DropDownList("MinPrice2", (IEnumerable<SelectListItem>)ViewBag.MinPrice, "Min. Price", new { id = "MaxRent", @class = "form-control" })
+                                                </div>
+                                                <div class="col-lg-2 col-md-2 col-sm-3 col-xs-12">
+                                                    @Html.DropDownList("MaxPrice2", (IEnumerable<SelectListItem>)ViewBag.MaxPrice, "Max. Price", new { id = "MaxRent", @class = "form-control" })
+                                                </div>
+                                                <div class="col-lg-2 col-md-2 col-sm-3 col-xs-12" style="display:none">
+                                                    <select>
+                                                        <option>Min area</option>
+                                                        <option value="1">1 Sqr/ft</option>
+                                                        <option value="2">2 Sqr/ft</option>
+                                                        <option value="3">3 Sqr/ft</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-lg-2 col-md-2 col-sm-3 col-xs-12" style="display:none">
+                                                    <select>
+                                                        <option>Max area</option>
+                                                        <option value="1">1 Sqr/ft</option>
+                                                        <option value="2">2 Sqr/ft</option>
+                                                        <option value="3">3 Sqr/ft</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2 col-md-2 col-sm-3 col-xs-12" onclick="javascript:document.getElementById('forSale').submit()">
+                                            <div class="rle_searchform_btn">
+                                                <img src="~/images/icon/search_icon.png">
+                                                <p>search</p>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <div role="tabpanel" class="tab-pane fade in active" id="rent">
+                                <div class="row">
+                                    @using (Html.BeginForm("SearchForRent", "Properties", FormMethod.Post, new { id = "forRent" }))
+                                    {
+                                        <div class="col-lg-10 col-md-10 col-sm-9 col-xs-12">
+                                            <div class="rle_searchform_box">
+                                                <div class="col-lg-6 col-md-6 col-sm-4 col-xs-12">
+                                                    <input type="serch" placeholder="Street, town & landmark">
+                                                </div>
+                                                <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                                                    @Html.DropDownList("Locations", (IEnumerable<SelectListItem>)ViewBag.Locations, new { id = "ddlLocations", @class = "form-control" })
+                                                </div>
+
+                                                <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                                                    @Html.DropDownList("PropertyTypes", (IEnumerable<SelectListItem>)ViewBag.PropertyTypes, new { id = "ddlUnits", @class = "form-control" })
+
+                                                </div>
+                                                <div class="col-lg-2 col-md-2 col-sm-4 col-xs-12">
+                                                    @Html.DropDownList("Beds", (IEnumerable<SelectListItem>)ViewBag.Beds, new { @id = "country19", @class = "form-control" })
+                                                </div>
+                                                <div class="col-lg-2 col-md-2 col-sm-4 col-xs-12">
+                                                    @Html.DropDownList("Baths", (IEnumerable<SelectListItem>)ViewBag.Baths, new { @id = "country19", @class = "form-control" })
+                                                </div>
+                                                <div class="col-lg-2 col-md-2 col-sm-3 col-xs-12">
+                                                    <select name="parkingLot">
+                                                        <option>Parking Lot</option>
+                                                        <option value="Yes">Yes</option>
+                                                        <option value="No">No</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-lg-2 col-md-2 col-sm-3 col-xs-12">
+                                                    @Html.DropDownList("MinPrice", (IEnumerable<SelectListItem>)ViewBag.MinPrice, "Min. Price", new { id = "MaxRent", @class = "form-control" })
+                                                </div>
+                                                <div class="col-lg-2 col-md-2 col-sm-3 col-xs-12">
+                                                    @Html.DropDownList("MaxPrice", (IEnumerable<SelectListItem>)ViewBag.MaxPrice, "Max. Price", new { id = "MaxRent", @class = "form-control" })
+                                                </div>
+                                                <div class="col-lg-2 col-md-2 col-sm-3 col-xs-12" style="display:none">
+                                                    <select>
+                                                        <option>Min area</option>
+                                                        <option value="1">1 Sqr/ft</option>
+                                                        <option value="2">2 Sqr/ft</option>
+                                                        <option value="3">3 Sqr/ft</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-lg-2 col-md-2 col-sm-3 col-xs-12" style="display:none">
+                                                    <select>
+                                                        <option>Max area</option>
+                                                        <option value="1">1 Sqr/ft</option>
+                                                        <option value="2">2 Sqr/ft</option>
+                                                        <option value="3">3 Sqr/ft</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2 col-md-2 col-sm-3 col-xs-12" onclick="javascript:document.getElementById('forRent').submit()">
+                                            <div class="rle_searchform_btn">
+                                                <img src="~/images/icon/search_icon.png">
+                                                <p>search</p>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Property Wrapper start -->
+    <div class="rle_property_wrapper rle_toppadder100 rle_bottompadder70">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="rle_center_heading rle_bottompadder60">
+                        <h1>Featured properties</h1>
+                    </div>
+                </div>
+                @foreach (var item in Model.FeaturedProperties)
+                {
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                        <div class="rle_property_infobox">
+                            <div class="rle_property_infobox_img">
+                                <a href="@Url.Action("Details", "Properties", new { id = item.PropertyID })"><img src="@Html.DisplayFor(modelItem => item.ImageMainUrl)" alt=" "></a>
+                                <span>
+                                    <sup>₦</sup>@string.Format("{0:#,0.00}", item.RentAmount)
+                                    @if (item.Category == "For Rent")
+                                    {
+                                        <sub style="text-transform:lowercase">p/y</sub>
+                                    }
+                                </span>
+                            </div>
+                            <div class="rle_property_infobox_details" style="background-color:black">
+                                <div class="rle_property_infobox_details_header">
+                                    <ul>
+                                        @if (item.Category.ToString() == "For Sale")
+                                        {
+                                            <li class="rle_red_clr">for sale</li>
+                                        }
+                                        else if (item.Category.ToString() == "For Rent")
+                                        {
+                                            <li class="rle_green_clr">for rent</li>
+                                        }
+                                    </ul>
+
+
+                                    <h3><a href="@Url.Action("Details", "Properties", new { id = item.PropertyID })" style="color:white">@Html.DisplayFor(modelItem => item.Name)</a></h3>
+                                    <p style="color:white">@Html.DisplayFor(modelItem => item.Address)</p>
+                                </div>
+                                <div class="rle_property_infobox_details_footer">
+                                    @*@Html.Partial("_VoteShow")*@
+                                    @{
+                                        Single m_Average = 0;
+
+                                        Single m_totalNumberOfVotes = 0;
+                                        Single m_totalVoteCount = 0;
+                                        Single m_currentVotesCount = 0;
+                                        Single m_inPercent = 0;
+                                        var thisVote = string.Empty;
+
+                                        if (item.Votes.Length > 0)
+                                        {
+                                            // calculate total votes now
+                                            string[] votes = item.Votes.Split(',');
+                                            for (int i = 0; i < votes.Length; i++)
+                                            {
+                                                m_currentVotesCount = int.Parse(votes[i]);
+                                                m_totalNumberOfVotes = m_totalNumberOfVotes + m_currentVotesCount;
+                                                m_totalVoteCount = m_totalVoteCount + (m_currentVotesCount * (i + 1));
+                                            }
+                                            m_Average = m_totalVoteCount / m_totalNumberOfVotes;
+                                            m_inPercent = (m_Average * 100) / 5;
+                                            string ms_inPercent = m_inPercent + "%";
+
+                                            <p style="display: block; width: 100px; height: 20px; background: url(../images/white_star_black_bg.png) 0 0;">
+                                                <span style="display: block; width: @ms_inPercent; height: 20px; background: url(../images/yellow_star_black_bg.png) 0 -20px;">
+
+                                                </span>
+                                            </p>
+                                        }
+                                    }
+
+
+                                    @*<p>Area : 3578 sqft </p>*@
+                                    <ul style="float:right">
+                                        <li><i class="fa fa-bed" aria-hidden="true"></i> @Html.DisplayFor(modelItem => item.Beds).ToString().PadLeft(2, '0')</li>
+                                        <li><i class="fa fa-bath" aria-hidden="true"></i> @Html.DisplayFor(modelItem => item.Baths).ToString().PadLeft(2, '0')</li>
+                                        <li><i class="fa fa-taxi" aria-hidden="true"></i> yes</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                                        }
+            </div>
+        </div>
+    </div>
+    <!-- Property Wrapper start -->
+    <div class="rle_property_wrapper rle_toppadder100 rle_bottompadder70" style="margin-top:-100px">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="rle_center_heading rle_bottompadder60">
+                        <h1>Recent properties</h1>
+                        <p>Check out some recent properties</p>
+                    </div>
+                </div>
+                @foreach (var item in Model.PropertyList)
+                {
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                        <div class="rle_property_infobox">
+                            <div class="rle_property_infobox_img">
+                                <a href="@Url.Action("Details", "Properties", new { id = item.PropertyID })"><img src="@Html.DisplayFor(modelItem => item.ImageMainUrl)" alt=" "></a>
+                                <span>
+                                    <sup>₦</sup>@string.Format("{0:#,0.00}", item.RentAmount)
+                                    @if (item.Category == "For Rent")
+                                    {
+                                        <sub style="text-transform:lowercase">p/y</sub>
+                                    }
+                                </span>
+                            </div>
+                            <div class="rle_property_infobox_details">
+                                <div class="rle_property_infobox_details_header">
+                                    <ul>
+                                        @if (item.Category.ToString() == "For Sale")
+                                        {
+                                            <li class="rle_red_clr">for sale</li>
+                                        }
+                                        else if (item.Category.ToString() == "For Rent")
+                                        {
+                                            <li class="rle_green_clr">for rent</li>
+                                        }
+                                        @if (item.Featured == true)
+                                        {
+                                            <li class="rle_black_clr">featured </li>
+                                        }
+                                    </ul>
+
+
+                                    <h3><a href="@Url.Action("Details", "Properties", new { id = item.PropertyID })">@Html.DisplayFor(modelItem => item.Name)</a></h3>
+                                    <p>@Html.DisplayFor(modelItem => item.Address)</p>
+                                </div>
+                                <div class="rle_property_infobox_details_footer">
+                                    @*@Html.Partial("_VoteShow")*@
+                                    @{
+                                        Single m_Average = 0;
+
+                                        Single m_totalNumberOfVotes = 0;
+                                        Single m_totalVoteCount = 0;
+                                        Single m_currentVotesCount = 0;
+                                        Single m_inPercent = 0;
+                                        var thisVote = string.Empty;
+
+                                        if (item.Votes.Length > 0)
+                                        {
+                                            // calculate total votes now
+                                            string[] votes = item.Votes.Split(',');
+                                            for (int i = 0; i < votes.Length; i++)
+                                            {
+                                                m_currentVotesCount = int.Parse(votes[i]);
+                                                m_totalNumberOfVotes = m_totalNumberOfVotes + m_currentVotesCount;
+                                                m_totalVoteCount = m_totalVoteCount + (m_currentVotesCount * (i + 1));
+                                            }
+
+                                            m_Average = m_totalVoteCount / m_totalNumberOfVotes;
+                                            m_inPercent = (m_Average * 100) / 5;
+                                            string ms_inPercent = m_inPercent + "%";
+
+                                            //"<small class=\"smallText\"><span itemprop=\"ratingCount\">" + m_totalNumberOfVotes + " People rated this.</span></small>  ";
+
+                                            <p style="display: block; width: 100px; height: 20px; background: url(../images/whitestar.gif) 0 0;">
+                                                <span style="display: block; width: @ms_inPercent; height: 20px; background: url(../images/yellowstar.gif) 0 -20px;">
+
+                                                </span>
+                                            </p>
+                                        }
+                                    }
+
+
+                                    @*<p>Area : 3578 sqft </p>*@
+                                    <ul style="float:right">
+                                        <li><i class="fa fa-bed" aria-hidden="true"></i> @Html.DisplayFor(modelItem => item.Beds).ToString().PadLeft(2, '0')</li>
+                                        <li><i class="fa fa-bath" aria-hidden="true"></i> @Html.DisplayFor(modelItem => item.Baths).ToString().PadLeft(2, '0')</li>
+                                        <li><i class="fa fa-taxi" aria-hidden="true"></i> yes</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                                        }
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="rle_btn_wrapper rle_toppadder40">
+                        <a href="@Url.Action("Property Listing", "Properties")" class="rle_btn">View all properties</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Price Histry Wrapper start -->
+    <div class="rle_pricehistry_wrapper rle_toppadder60 rle_bottompadder60">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
+                    <div class="rle_pricehistry_text">
+                        <p>Subscribe to our property management software <span>for your properties?</span></p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <div class="rle_pricehistry_btn">
+                        <a href="@Url.Action("Subscription Plans","Home")" class="rle_btn">Subscribe</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- popular areas Wrapper start -->
+    <div class="rle_popularareas_wrapper rle_toppadder100 rle_bottompadder70">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="rle_center_heading rle_bottompadder60">
+                        <h1>Explore popular areas near you</h1>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" style="cursor:pointer" onclick="SearchLocation('Nnewi');">
+                            <div class="rle_popularareas_img">
+                                <img src="~/images/Locations/nnewi2.jpg" alt="" title="Nnewi" />
+                                <div class="rle_popularareas_text">
+                                    <h4>Nnewi</h4>
+                                    <p>
+                                        @ViewBag.Nnewi @{if (ViewBag.Nnewi < 2)
+                                            {<text>property</text>;
+                                            }
+                                            else
+                                            {<text>properties</text>;
+                                            } }
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" style="cursor:pointer" onclick="SearchLocation('Ihiala');">
+                            <div class="rle_popularareas_img">
+                                <img src="~/images/Locations/nnewi.jpg" alt="" title="Ihiala" />
+                                <div class="rle_popularareas_text">
+                                    <h4>Ihiala</h4>
+                                    <p>
+                                        @ViewBag.Ihiala @{if (ViewBag.Ihiala < 2)
+                                            {<text>property</text>;
+                                            }
+                                            else
+                                            {<text>properties</text>;
+                                            } }
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="cursor:pointer" onclick="SearchLocation('Awka');">
+                            <div class="rle_popularareas_img">
+                                <img src="~/images/Locations/awka.jpg" alt="" title="Awka" />
+                                <div class="rle_popularareas_text">
+                                    <h4>Awka</h4>
+                                    <p>
+                                        @ViewBag.Awka @{if (ViewBag.Awka < 2)
+                                            {<text>property</text>;
+                                            }
+                                            else
+                                            {<text>properties</text>;
+                                            } }
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" style="cursor:pointer" onclick="SearchLocation('Umunze');">
+                            <div class="rle_popularareas_img">
+                                <img src="~/images/Locations/umunze3.png" alt="" title="Umunze" />
+                                <div class="rle_popularareas_text">
+                                    <h4>Umunze</h4>
+                                    <p>
+                                        @ViewBag.Umunze @{if (ViewBag.Umunze < 2)
+                                            {<text>property</text>;
+                                            }
+                                            else
+                                            {<text>properties</text>;
+                                            } }
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" style="cursor:pointer" onclick="SearchLocation('Igbariam');">
+                            <div class="rle_popularareas_img">
+                                <img src="~/images/Locations/igbariam3.png" alt="" title="Igbariam" />
+                                <div class="rle_popularareas_text">
+                                    <h4>Igbariam</h4>
+                                    <p>
+                                        @ViewBag.Igbariam @{if (ViewBag.Igbariam < 2)
+                                            {<text>property</text>;
+                                            }
+                                            else
+                                            {<text>properties</text>;
+                                            } }
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="rle_popularareas_img" style="cursor:pointer" onclick="SearchLocation('Onitsha');">
+                                <img src="~/images/Locations/onitsha888.jpg" alt="" title="Onitsha" />
+                                <div class="rle_popularareas_text">
+                                    <h4>Onitsha</h4>
+                                    <p>
+                                        @ViewBag.Onitsha @{if (ViewBag.Onitsha < 2)
+                                            {<text>property</text>;
+                                            }
+                                            else
+                                            {<text>properties</text>;
+                                            }
+                                        }
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="rle_popularareas_img" style="cursor:pointer" onclick="SearchLocation('Ekwulobia');">
+                                <img src="~/images/Locations/ekwulobia.png" alt="" title="Ekwulobia" />
+                                <div class="rle_popularareas_text">
+                                    <h4>Ekwulobia</h4>
+                                    <p>
+                                        @ViewBag.Ekwulobia @{if (ViewBag.Ekwulobia < 2)
+                                            {<text>property</text>;
+                                            }
+                                            else
+                                            {<text>properties</text>;
+                                            } }
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="rle_popularareas_img" style="cursor:pointer" onclick="SearchLocation('Mbakwu');">
+                                <img src="~/images/Locations/Mbakwu.jpg" alt="" title="Mbakwu" />
+                                <div class="rle_popularareas_text">
+                                    <h4>Mbakwu</h4>
+                                    <p>
+                                        @ViewBag.Mbakwu @{if (ViewBag.Mbakwu < 2)
+                                            {<text>property</text>;
+                                            }
+                                            else
+                                            {<text>properties</text>;
+                                            } }
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" style="cursor:pointer" onclick="SearchLocation('Nkpor');">
+                            <div class="rle_popularareas_img">
+                                <img src="~/images/Locations/nkpor.jpg" alt="" title="Nkpor" />
+                                <div class="rle_popularareas_text">
+                                    <h4>Nkpor</h4>
+                                    <p>
+                                        @ViewBag.Nkpor @{if (ViewBag.Nkpor < 2)
+                                            {<text>property</text>;
+                                            }
+                                            else
+                                            {<text>properties</text>;
+                                            } }
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" style="cursor:pointer" onclick="SearchLocation('Aguleri');">
+                            <div class="rle_popularareas_img">
+                                <img src="~/images/Locations/aguleri.jpg" alt="" title="Aguleri" />
+                                <div class="rle_popularareas_text">
+                                    <h4>Aguleri</h4>
+                                    <p>
+                                        @ViewBag.Aguleri @{if (ViewBag.Aguleri < 2)
+                                            {<text>property</text>;
+                                            }
+                                            else
+                                            {<text>properties</text>;
+                                            } }
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="rle_popularareas_img" style="cursor:pointer" onclick="SearchLocation('Achina');">
+                                <img src="~/images/Locations/achina.jpg" alt="" title="Achina" />
+                                <div class="rle_popularareas_text">
+                                    <h4>Achina</h4>
+                                    <p>
+                                        @ViewBag.Achina @{if (ViewBag.Nnewi < 2)
+                                            {<text>property</text>;
+                                            }
+                                            else
+                                            {<text>properties</text>;
+                                            } }
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="rle_popularareas_img" style="cursor:pointer" onclick="SearchLocation('Oko');">
+                                <img src="~/images/Locations/Oko.jpg" alt="" title="Oko" />
+                                <div class="rle_popularareas_text">
+                                    <h4>Oko</h4>
+                                    <p>
+                                        @ViewBag.Oko @{if (ViewBag.Oko < 2)
+                                            {<text>property</text>;
+                                            }
+                                            else
+                                            {<text>properties</text>;
+                                            } }
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display:none">
+                            @Html.BeginForm("SearchLocation", "Properties", FormMethod.Post, new { id = "SearchLocationForm" })
+                            {
+                            <input type="hidden" name="SearchLocation" id="SearchLocation" />
+                            }
+                            <script>
+                                function SearchLocation(location) {
+                                    document.getElementById("SearchLocation").value = location;
+                                    document.getElementById("SearchLocationForm").submit();
+                                };
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Latest news Wrapper start -->
+    <div class="rle_latesnews_wrapper rle_toppadder100 rle_bottompadder100">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="rle_center_heading rle_bottompadder60">
+                        <h1>Recent Blog Posts</h1>
+                    </div>
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="rle_news_slider">
+                        <div class="owl-carousel owl-theme">
+                            @foreach (var item in Model.Blogs)
+                            {
+                                <div class="item">
+                                    <div class="rle_news_slider_details">
+                                        <a href="@Url.Action("BlogDetail", "Home", new { id = item.ID, name = item.Title })"><img src="@Html.DisplayFor(modelItem => item.ImageUrl)" alt=" " height="300" class="img-responsive"></a>
+                                        <div class="rle_news_slider_details_text">
+                                            <p>
+                                                @{ DateTime postedDate = Convert.ToDateTime(item.DatePosted);}
+                                                @String.Format("{0:dddd, MMMM d, yyyy}", postedDate)
+                                            </p>
+                                            <h4>@Html.DisplayFor(modelItem => item.Title)</h4>
+                                            <span>
+                                                <a href="@Url.Action("BlogDetail", "Home", new { id = item.ID, name = item.Title })">read more <i class="fa fa-long-arrow-right" aria-hidden="true"></i></a>
+                                            </span>
+
+                                            <span style="float:right">
+                                                @{
+                                                    int blog_id = item.ID;
+                                                    string count = new PropertyManagerWeb.Models.ApplicationDbContext().BlogComments.Where(b => b.BlogId == blog_id).Count().ToString();
+                                                    <a href="@Url.Action("BlogDetail", "Home", new { id = item.ID, name = item.Title })">
+                                                        @count<i class="fa fa-comments"></i>
+                                                    </a>
+                                                }
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                                    }
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="rle_btn_wrapper rle_toppadder40">
+                        <a href="@Url.Action("Blog Posts", "Home")" class="rle_btn">View all Posts</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- People Saying Wrapper start -->
+    <div class="rle_people_saying_wrapper2 rle_toppadder100 rle_bottompadder70">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="rle_center_heading rle_bottompadder60">
+                        <h1>What people saying</h1>
+                    </div>
+                </div>
+                <div class="rle_people_saying_slider">
+                    <div class="owl-carousel owl-theme">
+                        <div class="item">
+                            <div class="rle_peoplesay_slider_details">
+                                <div class="rle_peoplesay_slider_details_img">
+                                    <img src="~/Images/People/passport1.jpg" width="100" />
+                                </div>
+                                <div class="rle_peoplesay_slider_details_text">
+                                    <img src="images/icon/quote.png" alt="" title="">
+                                    <p>We chose Anambra Real Estate to sell property after doing an internet search for real estate agents. They contacted me quickly and were friendly, helpful and honest. </p>
+                                    <h4>Ikeh Okafor, <span>Awka</span></h4>
+                                </div>
+                            </div>
+                            <div class="rle_peoplesay_slider_details">
+                                <div class="rle_peoplesay_slider_details_img">
+                                    <img src="~/Images/People/passport2.png" width="100" />
+                                </div>
+                                <div class="rle_peoplesay_slider_details_text">
+                                    <img src="images/icon/quote.png" alt="" title="">
+                                    <p>Thank you Anambra Real Estate for providing me with your wealth of knowledge in putting together a go-to-market strategy and selling the house in just two days! </p>
+                                    <h4>Theresa Ugwu, <span>Achina</span></h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="rle_peoplesay_slider_details">
+                                <div class="rle_peoplesay_slider_details_img">
+                                    <img src="~/Images/People/passport3.png" width="100" />
+                                </div>
+                                <div class="rle_peoplesay_slider_details_text">
+                                    <img src="images/icon/quote.png" alt="" title="">
+                                    <p>I was recently posted to Anambra State so I needed an apartment to rent. With Anambra Real Estate, I had my need resolved within a very short period of time.</p>
+                                    <h4>Jibril Lawal, <span> Onitsha</span></h4>
+                                </div>
+                            </div>
+                            <div class="rle_peoplesay_slider_details">
+                                <div class="rle_peoplesay_slider_details_img">
+                                    <img src="~/Images/People/passport4.png" width="100" />
+                                </div>
+                                <div class="rle_peoplesay_slider_details_text">
+                                    <img src="images/icon/quote.png" alt="" title="">
+                                    <p>After having my home on the market for six months and not receiving any offers, I decided to switch my home sale over to Alpha Housing had done.</p>
+                                    <h4>Kingley Onuoha, <span>Nnewi</span></h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="rle_peoplesay_slider_details">
+                                <div class="rle_peoplesay_slider_details_img">
+                                    <img src="~/Images/People/passport6.png" width="100" />
+                                </div>
+                                <div class="rle_peoplesay_slider_details_text">
+                                    <img src="images/icon/quote.png" alt="" title="">
+                                    <p>I like the idea that the platform has verified Agents. This will surely keep fraudsters in check.</p>
+                                    <h4>Jennifer Slaney, <span>Awka</span></h4>
+                                </div>
+                            </div>
+                            <div class="rle_peoplesay_slider_details">
+                                <div class="rle_peoplesay_slider_details_img">
+                                    <img src="~/Images/People/passport5.jpg" width="100" />
+                                </div>
+                                <div class="rle_peoplesay_slider_details_text">
+                                    <img src="images/icon/quote.png" alt="" title="">
+                                    <p>Anambra is a beautiful city. You will not know until you visit Anambra Real Estate!</p>
+                                    <h4>Ukaegbu Francis, <span>Aguleri</span></h4>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Partner Wrapper start -->
+    <div class="rle_partner_wrapper rle_toppadder60 rle_bottompadder60" style="display:none">
+        <div class="container">
+            <div class="row">
+                <ul>
+                    <li><img src="~/Images/ABS_Logo_fb.jpg" alt="" title=""></li>
+                    <li><img src="~/Images/surveyors_logo.png" alt="" title=""></li>
+                    <li><img src="~/Images/surveyors_logo2.png" alt="" title=""></li>
+                    <li><img src="http://placehold.it/117x47" alt="" title=""></li>
+                    <li><img src="~/Images/logo-anambra.png" alt="" title=""></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- Footer Wrapper start -->
+    <div class="rle_footer_wrapper rle_toppadder100" style="background: url(../images/map.png) 0 0;">
+        <div class="container">
+            <div class="row">
+                <div class="rle_top_footer">
+                    <div class="col-lg-4 col-md-4 col-sm-12">
+                        <div class="widget text-widget">
+                            <img src="~/images/icon/a_logo_white_fit.png" alt="Footer Logo" />
+                            <p class="rle_footertext">Anambra Real Estate is No 1 Property portal and has been adjudged as the most preferred by independent surveys the portal provides a platform for property.</p>
+                            <a href="@Url.Action("ContactUs","Home")" class="rle_btn">Contact us today</a>
+                            @if (Request.IsAuthenticated && User.Identity.GetUserId() == "c15dc77d-01c4-4394-8c33-fc9f38fe19b1")
+                            {
+                                <a href="#" class="rle_btn">Messages</a>
+                            }
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-12">
+                        <div class="widget text-widget">
+                            <h4 class="widget-title">Company</h4>
+                            <ul>
+                                <li><a href="#">Browse Properties</a></li>
+                                <li><a href="#">Landlords</a></li>
+                                <li><a href="#">Renters</a></li>
+                                <li><a href="#">Services</a></li>
+                                <li><a href="#">Pricing</a></li>
+                                <li><a href="#">ContactUs</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-12">
+                        <div class="widget text-widget">
+                            <h4 class="widget-title">Support</h4>
+                            <ul>
+                                <li><a href="#">Help & FAQ</a></li>
+                                <li><a href="#">ContactUs</a></li>
+                                <li><a href="#">Privacy Policy</a></li>
+                                <li><a href="#">Careers</a></li>
+                                <li><a href="#">Our Partners</a></li>
+                                <li><a href="#">Term & Services</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-12">
+                        <div class="widget text-widget">
+                            <h4 class="widget-title">Reach out</h4>
+                            <ul>
+                                <li><p><i class="fa fa-map-marker" aria-hidden="true"></i> PeacKastel Plaza Opposite Old INEC Office <br /> Okpuno Road, Awka</p></li>
+                                <li><p><i class="fa fa-envelope-open-o" aria-hidden="true"></i> <a href="#">info@anambrarealestate.com</a></p></li>
+                                <li><p><i class="fa fa-phone" aria-hidden="true"></i> (+234) 08038466464</p></li>
+                            </ul>
+                            <ul class="rle_social_iicon">
+                                <li><a href="https://web.facebook.com/anambrarealestate" target="_blank"><img src="~/images/icon/ftr_scl1.png" alt="" title=""></a></li>
+                                <li><a href="https://twitter.com/Anambraestate" target="_blank"><img src="~/images/icon/ftr_scl2.png" alt="" title=""></a></li>
+                                <li><a href="#"><img src="~/images/icon/ftr_scl3.png" alt="" title=""></a></li>
+                                <li><a href="#"><img src="~/images/icon/ftr_scl4.png" alt="" title=""></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="rle_bottom_footer">
+                    <p>Copyright © @DateTime.Now.Year <a href="http://www.anambrarealestate.com">Anambra Real Estate.</a> All Rights Reserved. Powered by <a href="http://www.pixelssolution.com"> <span>Pixels Solution Ltd.</span></a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--main js file start-->
+    <script type="text/javascript" src="../js/jquery.js"></script>
+    <script type="text/javascript" src="../js/bootstrap.js"></script>
+    <script type="text/javascript" src="../js/owl.carousel.js"></script>
+    <script type="text/javascript" src="../js/jquery-ui.js"></script>
+    <script type="text/javascript" src="../js/custom.js"></script>
+    <!--main js file end-->
+</body>
+</html>

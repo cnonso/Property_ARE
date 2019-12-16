@@ -1,0 +1,227 @@
+﻿@model IEnumerable<PropertyManagerWeb.Models.Blog>
+@using PropertyManagerWeb.Models;
+@{
+    ViewBag.Title = "Blog Posts";
+}
+
+
+@helper buildLinks(int start, int end, string innerContent)
+{
+for (int i = start; i <= end; i++)
+{
+
+        <a style="color:@(i == ViewBag.Currentpage ? "white" : "")" class="@(i == ViewBag.Currentpage ? "active btn-info" : "")" href="@Url.Action("Blog Posts", "Home", new { page = i })">@(innerContent ?? i.ToString())</a>
+}
+}
+
+@helper pageLinks()
+{
+const int maxPages = 11;
+
+if (ViewBag.TotalPages <= maxPages)
+{
+        @buildLinks(1, (int)ViewBag.TotalPages, null)
+    return;
+}
+
+int pagesAfter = (Int16)ViewBag.TotalPages - ViewBag.CurrentPage; // Number of pages after current
+int pagesBefore = ViewBag.CurrentPage - 1; // Number of pages before current
+
+if (pagesAfter <= 4)
+{
+        @buildLinks(1, 1, null) // Show 1st page
+    int pageSubset = (Int16)ViewBag.TotalPages - maxPages - 1 > 1 ? (Int16)ViewBag.TotalPages - maxPages - 1 : 2;
+
+        @buildLinks(pageSubset, pageSubset, "...") // Show page subset (...)
+                                                @buildLinks((Int16)ViewBag.TotalPages - maxPages + 3, (Int16)ViewBag.TotalPages, null) // Show last pages
+    return; // Exit
+}
+
+if (pagesBefore <= 4)
+{
+        @buildLinks(1, maxPages - 2, null) // Show 1st pages
+    int pageSubset = maxPages + 2 < (Int16)ViewBag.TotalPages ? maxPages + 2 : (Int16)ViewBag.TotalPages - 1;
+
+        @buildLinks(pageSubset, pageSubset, "...") // Show page subset (...)
+                                                @buildLinks((Int16)ViewBag.TotalPages, (Int16)ViewBag.TotalPages, null) // Show last page
+    return; // Exit
+}
+
+if (pagesAfter > 4)
+{
+        @buildLinks(1, 1, null) // Show 1st pages
+    int pageSubset1 = ViewBag.CurrentPage - 7 > 1 ? ViewBag.CurrentPage - 7 : 2;
+    int pageSubset2 = ViewBag.CurrentPage + 7 < (Int16)ViewBag.TotalPages ? (Int16)ViewBag.CurrentPage + 7 : (Int16)ViewBag.TotalPages - 1;
+
+        @buildLinks(pageSubset1, pageSubset1, pageSubset1 == ViewBag.CurrentPage - 4 ? null : "...") // Show 1st page subset (...)
+                                                                                                    @buildLinks(ViewBag.CurrentPage - 3, ViewBag.CurrentPage + 3, null) // Show middle pages
+
+    // Show 2nd page subset (...)
+    // only show ... if page is contigous to the previous one.
+
+        @buildLinks(pageSubset2, pageSubset2, pageSubset2 == ViewBag.CurrentPage + 4 ? null : "...")
+        @buildLinks((Int16)ViewBag.TotalPages, (Int16)ViewBag.TotalPages, null) // Show last page
+    return; // Exit
+}
+}
+
+
+<script>
+    window.onload = function () {
+        document.getElementById('breadcrumb').style.display = 'none';
+    };
+</script>
+<!-- Breadcrumb Wrapper start -->
+<div class="rle_pagetitle_wrapper style_2 rle_toppadder30 rle_bottompadder30">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="page_title">
+                    <h2>Blog</h2>
+                </div>
+                <ul class="breadcrumb">
+                    <li><a href="@Url.Action("Index","Home")"><i class="fa fa-home" aria-hidden="true"></i> home</a></li>
+                    <li><i class="fa fa-angle-right" aria-hidden="true"></i></li>
+                    <li><a href="@Url.Action("Blog Posts","Home")">Blog</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Blog Wrapper start -->
+<div class="rle_blog_wrapper rle_toppadder100 rle_bottompadder100">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+                @if (Model.Count() == 0)
+                {
+                    <h3>No Blogs Posted</h3>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {                         
+                            int blog_id = item.ID;
+                            string count = new ApplicationDbContext().BlogComments.Where(b => b.BlogId == blog_id).Count().ToString();
+                        
+                        <div class="rle_blog_item rle_bottompadder30">
+                            <div class="rle_blog_image">
+                                <a href="@Url.Action("BlogDetail", "Home", new { id = item.ID, title = item.Title, cC = count })"><img src="@Html.DisplayFor(modelItem => item.ImageUrl)" alt=" " height="300" class="img-responsive"></a>
+                            </div>
+                            <div class="rle_blog_info">
+                                <span>
+                                    Posted On
+                                    @{ DateTime postedDate = Convert.ToDateTime(item.DatePosted);}
+                                    @String.Format("{0:dddd, MMMM d, yyyy}", postedDate)
+                                </span>
+
+                                <h3>
+                                    <a href="@Url.Action("BlogDetail", "Home", new { id = item.ID, title = item.Title, cC = count  })">@Html.DisplayFor(modelItem => item.Title)</a>
+                                   
+                                    <i style="float:right;font-size:small" title="@count comment(s)">
+                                        <a href="@Url.Action("BlogDetail", "Home", new { id =  item.ID, title = item.Title, cC = count  })">@count <i class="fa fa-comments"></i></a>
+                                    </i>
+                                </h3>
+                                @{ string blog_body = item.Body.ToString().Substring(0, Math.Min(item.Body.Length, 400)); }
+                                <p>@Html.Raw(blog_body)...</p>
+                                <a href="@Url.Action("BlogDetail", "Home", new { id =  item.ID, title = item.Title, cC = count  })" class="rle_link">read more <i class="fa fa-long-arrow-right" aria-hidden="true"></i></a>
+                            </div>
+                        </div>
+                                        }
+                                    }
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="rle_pagination_wrapper rle_toppadder30">
+                        <nav>
+
+                            @if (Model.Count() < 1)
+                            {
+                                <div class="col-md-12" style="background-color:white; height:1300px">
+                                    <h5 style="text-align:center; margin-top:100px">Sorry, there are no blog posts yet. </h5>
+                                </div>
+                            }
+                            else
+                            {
+
+                                int prevPage = int.Parse(ViewBag.CurrentPage.ToString()) - 1;
+                                int nextPage = int.Parse(ViewBag.CurrentPage.ToString()) + 1;
+
+                                <ul class="pagination">
+                                    <li style="display:@(prevPage == 0 ? "none" : "")"><a href="@Url.Action("Blog Posts", "Home", new { page = prevPage })"><i class="fa fa-angle-double-left" aria-hidden="true"></i></a></li>
+                                    <li>@pageLinks()</li>
+                                    <li style="display:@(ViewBag.CurrentPage == ViewBag.TotalPages ? "none" : "")"><a href="@Url.Action("Blog Posts", "Home", new { page = nextPage })"><i class="fa fa-angle-double-right" aria-hidden="true"></i></a></li>
+                                </ul>
+                            }
+                        </nav>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <div class="sidebar_wrapper">
+                    <aside class="widget widget_search">
+                        <h4 class="widget-title">Search</h4>
+                        <div class="input-group">
+                            @using (Html.BeginForm("SearchBlog", "Home", FormMethod.Post, new { @id = "blogSearchForm"}))
+                            {
+                            <input name="keyWord" type="text" placeholder="Type keyword...">
+                            }
+                            <span class="input-group-btn">
+                                <button onclick="javascript: document.getElementById('blogSearchForm').submit()" class="btn btn-default" type="button"><i class="fa fa-search"></i></button>
+                            </span>
+                        </div>
+                    </aside>
+
+                    <aside class="widget widget_categories" style="display:none">
+                        <h4 class="widget-title">Categories</h4>
+                        <ul>
+                            <li><a href="#">Real Estate</a></li>
+                            <li><a href="#">Luxury Housing</a></li>
+                            <li><a href="#">Paradise Mortagages</a></li>
+                            <li><a href="#">Christophe Harbour</a></li>
+                            <li><a href="#">Commerial Villa </a></li>
+                            <li><a href="#">Morden Apartment</a></li>
+                        </ul>
+                    </aside>
+
+                    <aside class="widget widget_recent_post">
+                        <h4 class="widget-title">Recent posts</h4>
+                        @{
+                            var recentPosts = new ApplicationDbContext().Blogs.OrderByDescending(c => c.DatePosted).Take(3).ToList();
+                            <ul>
+                                @foreach (var item in recentPosts)
+                                {
+                                    <li>
+                                        <a href="@Url.Action("BlogDetail", "Home", new { id = item.ID })"><img src="@Html.DisplayFor(modelItem => item.ImageUrl)" width="70" height="70" alt=" "></a>
+                                        <div class="rle_recent_post_info">
+                                            <p>@Html.DisplayFor(modelItem => item.Title)</p>
+                                            @{ DateTime postedDate = Convert.ToDateTime(item.DatePosted);}                                            
+                                            <span>@String.Format("{0:dddd, MMMM d, yyyy}", postedDate)</span>  
+                                        </div>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </aside>
+
+                    <aside class="widget widget_tag_cloud">
+                        <h4 class="widget-title">Tags</h4>
+                        <a href="#">Housing,</a>
+                        <a href="#">luxury,</a>
+                        <a href="#">real estate,</a>
+                        <a href="#">homes,</a>
+                        <a href="#">modern villa,</a>
+                        <a href="#">apartments,</a>
+                        <a href="#">beach,</a>
+                        <a href="#">property,</a>
+                        <a href="#">business deplux,</a>
+                        <a href="#">globe,</a>
+                        <a href="#">money</a>
+                    </aside>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+}

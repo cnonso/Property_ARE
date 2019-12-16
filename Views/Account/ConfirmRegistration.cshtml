@@ -1,0 +1,28 @@
+﻿
+@{
+    ViewBag.Title = "Info";
+}
+<div class="row">
+    <div class="col-md-4 col-md-offset-4" style="margin-top:20px">
+        <h2 style="text-align:center">Confirm Your Account</h2>
+        <p style="text-align:center"> An authentication code has been sent to your mail.  Enter the code to complete your registration process.</p>
+        <div style="margin-top:20px">
+            @using (Html.BeginForm("ConfirmRegistration", "Account", new { Email = ViewBag.Email }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                <div class="input-group">
+                    <input name="AuthCode" class="form-control" type="text"  />
+                    <span class="input-group-btn">
+                        <button type="submit" class="btn btn-info">Confirm</button>
+                    </span>
+                </div>
+            }
+
+            @using (Html.BeginForm("ResendAuthCode", "Account", new { Email = ViewBag.Email }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                
+                <input type="submit" value="Resend" class="btn btn-default" style="float:right; margin:20px"/>
+            }
+        </div>
+        <b style="color:red">@ViewBag.Notification</b>
+    </div>
+</div>

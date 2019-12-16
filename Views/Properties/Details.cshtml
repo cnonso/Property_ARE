@@ -1,0 +1,504 @@
+﻿@model PropertyManagerWeb.Models.MultipleModels
+
+@{
+    ViewBag.Title = "Property Details";
+}
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCmlb220Er3NeKZBpMRdQH07y0LgKQYbWc&callback=initMap"
+        type="text/javascript"></script>
+@if (Html.DisplayFor(model => model.Property.CoordinateLat).ToString() == "0")
+{
+    <script>
+        //var map;
+        var myCenter = new google.maps.LatLng( 8.971897294083027, 7.470703125);//Abuja= 8.971897294083027, 7.470703125; London = 51.508742, -0.120850
+        function initialize() {
+            var mapProp = {
+                center: myCenter,
+                zoom: 6,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+
+            var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+
+            //var marker = new google.maps.Marker({
+            //    position: myCenter,
+            //});
+
+            marker.setMap(map);
+        }
+
+        google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+}
+else
+{
+    <script>
+        //var map;
+        var myCenter = new google.maps.LatLng( @Html.DisplayFor(model => model.Property.CoordinateLat), @Html.DisplayFor(model => model.Property.CoordinateLong));//Abuja= 8.971897294083027, 7.470703125; London = 51.508742, -0.120850
+        function initialize() {
+            var mapProp = {
+                center: myCenter,
+                zoom: 15,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+
+            var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+
+            var marker = new google.maps.Marker({
+                position: myCenter,
+            });
+
+            marker.setMap(map);
+        }
+
+        google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+} 
+
+<!-- Property Single Wrapper start -->
+<div class="rle_property_single_wrapper rle_bottompadder70">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
+                <div class="rle_property_single_heading">
+                    <div class="rle_property_details_box col-md-6" style="">
+                        <div class="row">
+                            <div class="col-md-7">
+                                <h2>@Html.DisplayFor(model => model.Property.Name) <sup style="background-color: @(Model.Property.Category == "For Sale" ? "" : "limegreen" )">@Html.DisplayFor(model => model.Property.Category)</sup></h2>
+                                <p> @Html.DisplayFor(model => model.Property.Address)</p>
+                                @{Session["Location"] = Model.Property.Location;}
+                            </div>
+                            <div class="col-md-5">
+                                <span>
+                                    @Html.Partial("_VoteShow")
+                                </span>
+                                <span>
+                                    <small>Please rate this property:</small><br /> @Html.Partial("_VoteNow")
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <img style="margin-top:-30px" src="@Html.DisplayFor(model => model.Property.ImageMainUrl)" width="800" />
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                <div class="rle_property_details_box">
+                    @{
+
+                        var landlord_id = new PropertyManagerWeb.Models.ApplicationDbContext().Landlords.Where(c => c.LandlordID == Model.Property.LandlordID).First().IDforLand;
+                        var agentInfo = new PropertyManagerWeb.Models.ApplicationDbContext().Landlords.Find(landlord_id);
+                        <div class="user_info">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <h3>Agent info</h3><br />
+                            </div>
+
+                            <img src="@agentInfo.ImageMainUrl" width="100" height="100">
+                            <h4>@agentInfo.FullName</h4>
+                            <p>Agent <small style="text-transform:uppercase; color:white; padding-left:4px; padding-right:4px; background-color: @(agentInfo.Status.Contains("Unverified") ? "red" : "limegreen" )">@agentInfo.Status.Split()[1]</small></p>
+                            <ul>
+                                <li><a href="#" class="clr_facebook"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+                                <li><a href="#" class="clr_twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+                                <li><a href="#" class="clr_linkedin"><i class="fa fa-linkedin" aria-hidden="true"></i></a></li>
+                            </ul>
+                        </div>
+                        <div class="user_info_share">
+                            <ul>
+                                <li><a href="#"><i class="fa fa-phone" aria-hidden="true"></i> @agentInfo.Phone</a></li>
+                                <li><a href="#"><i class="fa fa-map-marker" aria-hidden="true"></i> @agentInfo.Address</a></li>
+                            </ul>
+                        </div>
+                    }
+                    <div class="user_info_form">
+                        @using (Html.BeginForm("DropMessage", "Landlords", FormMethod.Post, new { @name = "MessageForm", role = "form" }))
+                        {
+                            @Html.TextBoxFor(m => m.MessageViewModel.SenderName, new {@id="sender_name", @placeholder = "Your Name", @required = "required" })
+                            @Html.TextBoxFor(m => m.MessageViewModel.Email, new { @placeholder = "Email" })
+                            @Html.TextBoxFor(m => m.MessageViewModel.SenderPhoneNo, new { @placeholder = "Phone Number" })
+                            @Html.TextAreaFor(m => m.MessageViewModel.MessageBody, new {@id="messageBody", @placeholder = "Message", @required = "required", @rows = "6" })
+
+                            @*<input type="text" placeholder="Name">
+                                <input type="email" placeholder="Email">
+                                <input type="text" placeholder="Mobile">
+                                <textarea rows="6" placeholder="Message"></textarea>*@
+                            <input name="Property_Name" type="hidden" value="@Html.DisplayFor(m=>m.Property.Name)" />
+                            <input name="Landlord_ID" type="hidden" value="@Html.DisplayFor(m=>m.Property.LandlordID)" />
+                            @*<input onclick="showMessageProgress();" type="submit" value="Send">*@
+
+                            <p id="messageSendingStatus" style="color:green; text-align:center; display:none"><img src="~/Images/progress.gif" width="20" />Sending...</p>
+                            <button type="submit" onclick="showMessageProgress();" class="rle_btn">Contact Agent</button>
+                            <script>
+                                function showMessageProgress() {
+                                    if(document.getElementById('sender_name').value.length > 0 |document.getElementById('messageBody').value.length > 0 )
+                                    {
+                                        document.getElementById("messageSendingStatus").style.display = "block";
+                                    }
+                                    //setTimeout(function(){ document.getElementById("messageSendingStatus").style.display = "none"; }, 6000);
+                                };
+                            </script>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="rle_property_details_box">
+                    <h3>Property description</h3>
+                    <p>@Html.DisplayFor(model => model.Property.PlainDescription)</p>
+                </div>
+                <div class="rle_property_details_box" style="display:none">
+                    <h3>Features property</h3>
+                    <ul class="feature_prop">
+                        <li>
+                            <div class="rle_checkbox">
+                                <input type="checkbox" id="1" checked />
+                                <label for="1">Swimming Pool</label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rle_checkbox">
+                                <input type="checkbox" id="2" checked />
+                                <label for="2">Air Conditioning</label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rle_checkbox">
+                                <input type="checkbox" id="3" checked />
+                                <label for="3">Fireplace</label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rle_checkbox">
+                                <input type="checkbox" id="4" checked />
+                                <label for="4">Balcony</label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rle_checkbox">
+                                <input type="checkbox" id="5" checked />
+                                <label for="5">Garage</label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rle_checkbox">
+                                <input type="checkbox" id="6" checked />
+                                <label for="6">Electric Range</label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rle_checkbox">
+                                <input type="checkbox" id="7" checked />
+                                <label for="7">Washer</label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rle_checkbox">
+                                <input type="checkbox" id="8" checked />
+                                <label for="8">Sauna</label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rle_checkbox">
+                                <input type="checkbox" id="9" checked />
+                                <label for="9">Dual Sinks</label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rle_checkbox">
+                                <input type="checkbox" id="10" checked />
+                                <label for="10">Microwave</label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rle_checkbox">
+                                <input type="checkbox" id="11" checked />
+                                <label for="11">Bedding</label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rle_checkbox">
+                                <input type="checkbox" id="12" checked />
+                                <label for="12">Laundry</label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rle_checkbox">
+                                <input type="checkbox" id="13" checked />
+                                <label for="13">Tv cable</label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rle_checkbox">
+                                <input type="checkbox" id="14" checked />
+                                <label for="14">Refrigerator</label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rle_checkbox">
+                                <input type="checkbox" id="15" checked />
+                                <label for="15">Wifi</label>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="rle_property_details_box" style="display:none">
+                    <h3>Floor plan</h3>
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li role="presentation" class="active"><a href="#groud" aria-controls="groud" role="tab" data-toggle="tab">groud floor</a></li>
+                        <li role="presentation"><a href="#first" aria-controls="first" role="tab" data-toggle="tab">first floor</a></li>
+                        <li role="presentation"><a href="#second" aria-controls="second" role="tab" data-toggle="tab">second floor</a></li>
+                    </ul>
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active" id="groud">
+                            <p>Fusce eu scelerisque eros. Duis scelerisque, ante sed lacinia ullamcorper, erat lectus imperdiet ante, quis pharetra lectus dui in nisl.  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque eget lorem quis ex faucibus tempor. Nullam eget interdum neque, sed sodales nulla. Mauris pharetra vestibulum velit at finibus</p>
+                            <ul>
+                                <li><span>1458</span> sqft</li>
+                                <li><span>02</span> bedrooms</li>
+                                <li><span>02</span> bathroom</li>
+                                <li><span>₦2800</span> per month</li>
+                            </ul>
+                            <div class="floor_img">
+                                <img src="http://placehold.it/681x456" class="img-responsive">
+                            </div>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="first">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce eu scelerisque eros. Duis scelerisque, ante sed lacinia ullamcorper, erat lectus imperdiet ante, quis pharetra lectus dui in nisl. Quisque eget lorem quis ex faucibus tempor. Nullam eget interdum neque, sed sodales nulla. Mauris pharetra vestibulum velit at finibus</p>
+                            <ul>
+                                <li><span>1368</span> sqft</li>
+                                <li><span>02</span> bedrooms</li>
+                                <li><span>01</span> bathroom</li>
+                                <li><span>₦2300</span> per month</li>
+                            </ul>
+                            <div class="floor_img">
+                                <img src="http://placehold.it/681x456" class="img-responsive">
+                            </div>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="second">
+                            <p>Nullam eget interdum neque, sed sodales nulla. Mauris pharetra vestibulum velit at finibus Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce eu scelerisque eros. Duis scelerisque, ante sed lacinia ullamcorper, erat lectus imperdiet ante, quis pharetra lectus dui in nisl. Quisque eget lorem quis ex faucibus tempor. </p>
+                            <ul>
+                                <li><span>2510</span> sqft</li>
+                                <li><span>03</span> bedrooms</li>
+                                <li><span>03</span> bathroom</li>
+                                <li><span>₦3000</span> per month</li>
+                            </ul>
+                            <div class="floor_img">
+                                <img src="http://placehold.it/681x456" class="img-responsive">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="rle_property_details_box">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" style="display:none">
+                        <h3>Point of interest</h3>
+                        <div class="panel-group" id="accordion">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <a data-toggle="collapse" data-parent="#accordion" href="#collapse1"><i class="fa fa-building" aria-hidden="true"></i> School</a>
+                                    </h4>
+                                </div>
+                                <div id="collapse1" class="panel-collapse collapse in">
+                                    <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
+                                </div>
+                            </div>
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <a data-toggle="collapse" data-parent="#accordion" href="#collapse2"><i class="fa fa-coffee" aria-hidden="true"></i> Restaurant</a>
+                                    </h4>
+                                </div>
+                                <div id="collapse2" class="panel-collapse collapse">
+                                    <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
+                                </div>
+                            </div>
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <a data-toggle="collapse" data-parent="#accordion" href="#collapse3"><i class="fa fa-university" aria-hidden="true"></i> Bank</a>
+                                    </h4>
+                                </div>
+                                <div id="collapse3" class="panel-collapse collapse">
+                                    <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
+                                </div>
+                            </div>
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <a data-toggle="collapse" data-parent="#accordion" href="#collapse4"><i class="fa fa-train" aria-hidden="true"></i> Public Transportation</a>
+                                    </h4>
+                                </div>
+                                <div id="collapse4" class="panel-collapse collapse">
+                                    <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h3>View on map</h3>
+                            </div>
+                            <div class="col-md-12">
+                                <div id="googleMap" style="height:350px; border:thin; padding-left:20px"></div>
+                            </div>
+                        </div>
+                        @*<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2862.946176260837!2d-94.00080714881642!3d44.14635442831629!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x87f4398360b0ffe3%3A0xc8e0f38bc3920a41!2sMinnesota+State+University%2C+Mankato!5e0!3m2!1sen!2sin!4v1490446318407" width="600" height="450" frameborder="0" style="border:0" allowfullscreen></iframe>*@
+                    </div>
+                </div>
+                <div class="rle_property_details_box" style="display:none">
+                    <h3>Video tour</h3>
+                    <iframe src="https://www.youtube.com/embed/PPdhawk7ZRw" frameborder="0" allowfullscreen></iframe>
+                </div>
+                <div class="rle_property_details_box style_2" style="display:none">
+                    <h3>Agent info</h3>
+                    <div class="clearfix"></div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                        <div class="user_info">
+                            <img src="http://placehold.it/100x100">
+                            <h4>Nicholas Jacobs</h4>
+                            <p>Expert agent</p>
+                            <ul>
+                                <li><a href="#" class="clr_facebook"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+                                <li><a href="#" class="clr_twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+                                <li><a href="#" class="clr_linkedin"><i class="fa fa-linkedin" aria-hidden="true"></i></a></li>
+                            </ul>
+                        </div>
+                        <div class="user_info_share">
+                            <ul>
+                                <li><a href="#"><i class="fa fa-phone" aria-hidden="true"></i> (+012) 568 2367</a></li>
+                                <li><a href="#"><i class="fa fa-skype" aria-hidden="true"></i> NicholasJacobos</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                        <div class="user_info_form">
+                            <form>
+                                <div class="row">
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                        <input type="text" placeholder="Name">
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                        <input type="email" placeholder="Email">
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                        <input type="text" placeholder="Mobile">
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <textarea rows="6" placeholder="Message"></textarea>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <a href="#" class="rle_btn">get contact detail</a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Property Wrapper start -->
+<div class="rle_property_wrapper rle_toppadder100 rle_bottompadder70" style="margin-top:-100px">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="rle_center_heading rle_bottompadder60">
+                    <h1>@ViewBag.RelatedProperty</h1>
+                    <p>.</p>
+                </div>
+            </div>
+            @foreach (var item in Model.RelatedProperties)
+            {
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <div class="rle_property_infobox">
+                        <div class="rle_property_infobox_img">
+                            <a href="@Url.Action("Details", "Properties", new { id = item.PropertyID, location = item.Location })"><img src="@Html.DisplayFor(modelItem => item.ImageMainUrl)" alt=" "></a>
+                            <span>
+                                <sup>₦</sup>@string.Format("{0:#,0.00}", item.RentAmount)
+                                @if (item.Category == "For Rent")
+                                {
+                                    <sub style="text-transform:lowercase">p/y</sub>
+                                }
+                            </span>
+                        </div>
+                        <div class="rle_property_infobox_details">
+                            <div class="rle_property_infobox_details_header">
+                                <ul>
+                                    @if (item.Category.ToString() == "For Sale")
+                                    {
+                                        <li class="rle_red_clr">for sale</li>
+                                    }
+                                    else if (item.Category.ToString() == "For Rent")
+                                    {
+                                        <li class="rle_green_clr">for rent</li>
+                                    }
+                                    <li class="rle_black_clr">featured </li>
+                                </ul>
+
+
+                                <h3><a href="@Url.Action("Details", "Properties", new { id = item.PropertyID, location = item.Location })">@Html.DisplayFor(modelItem => item.Name)</a></h3>
+                                <p>@Html.DisplayFor(modelItem => item.Address)</p>
+                            </div>
+                            <div class="rle_property_infobox_details_footer">
+                                @*@Html.Partial("_VoteShow")*@
+                                @{
+                                    Single m_Average = 0;
+
+                                    Single m_totalNumberOfVotes = 0;
+                                    Single m_totalVoteCount = 0;
+                                    Single m_currentVotesCount = 0;
+                                    Single m_inPercent = 0;
+                                    var thisVote = string.Empty;
+
+                                    if (item.Votes.Length > 0)
+                                    {
+                                        // calculate total votes now
+                                        string[] votes = item.Votes.Split(',');
+                                        for (int i = 0; i < votes.Length; i++)
+                                        {
+                                            m_currentVotesCount = int.Parse(votes[i]);
+                                            m_totalNumberOfVotes = m_totalNumberOfVotes + m_currentVotesCount;
+                                            m_totalVoteCount = m_totalVoteCount + (m_currentVotesCount * (i + 1));
+                                        }
+
+                                        m_Average = m_totalVoteCount / m_totalNumberOfVotes;
+                                        m_inPercent = (m_Average * 100) / 5;
+                                        string ms_inPercent = m_inPercent + "%";
+
+                                        //"<small class=\"smallText\"><span itemprop=\"ratingCount\">" + m_totalNumberOfVotes + " People rated this.</span></small>  ";
+
+                                        <p style="display: block; width: 100px; height: 20px; background: url(../images/whitestar.gif) 0 0;">
+                                            <span style="display: block; width: @ms_inPercent; height: 20px; background: url(../images/yellowstar.gif) 0 -20px;">
+
+                                            </span>
+                                        </p>
+                                    }
+                                }
+
+
+                                @*<p>Area : 3578 sqft </p>*@
+                                <ul style="float:right">
+                                    <li><i class="fa fa-bed" aria-hidden="true"></i> @Html.DisplayFor(modelItem => item.Beds).ToString().PadLeft(2, '0')</li>
+                                    <li><i class="fa fa-bath" aria-hidden="true"></i> @Html.DisplayFor(modelItem => item.Baths).ToString().PadLeft(2, '0')</li>
+                                    <li><i class="fa fa-taxi" aria-hidden="true"></i> yes</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                                    }
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="rle_btn_wrapper rle_toppadder40">
+                    <a href="@Url.Action("Property Listing", "Properties")" class="rle_btn">View all properties</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+@section Scripts {
+}

@@ -1,0 +1,187 @@
+﻿@model IEnumerable<PropertyManagerWeb.Models.Landlord>
+
+@{
+    ViewBag.Title = "All Agents";
+}
+
+
+@helper buildLinks(int start, int end, string innerContent)
+{
+for (int i = start; i <= end; i++)
+{
+        <a class="@(i == ViewBag.Currentpage ? "btn btn-info frist" : "btn btn-default")" href="@Url.Action("Index", "Landlords", new { page = i })">@(innerContent ?? i.ToString())</a>
+}
+}
+
+@helper pageLinks()
+{
+const int maxPages = 11;
+
+if (ViewBag.TotalPages <= maxPages)
+{
+        @buildLinks(1, (int)ViewBag.TotalPages, null)
+    return;
+}
+
+int pagesAfter = (Int16)ViewBag.TotalPages - ViewBag.CurrentPage; // Number of pages after current
+int pagesBefore = ViewBag.CurrentPage - 1; // Number of pages before current
+
+if (pagesAfter <= 4)
+{
+        @buildLinks(1, 1, null) // Show 1st page
+    int pageSubset = (Int16)ViewBag.TotalPages - maxPages - 1 > 1 ? (Int16)ViewBag.TotalPages - maxPages - 1 : 2;
+
+        @buildLinks(pageSubset, pageSubset, "...") // Show page subset (...)
+                                                @buildLinks((Int16)ViewBag.TotalPages - maxPages + 3, (Int16)ViewBag.TotalPages, null) // Show last pages
+    return; // Exit
+}
+
+if (pagesBefore <= 4)
+{
+        @buildLinks(1, maxPages - 2, null) // Show 1st pages
+    int pageSubset = maxPages + 2 < (Int16)ViewBag.TotalPages ? maxPages + 2 : (Int16)ViewBag.TotalPages - 1;
+
+        @buildLinks(pageSubset, pageSubset, "...") // Show page subset (...)
+                                                @buildLinks((Int16)ViewBag.TotalPages, (Int16)ViewBag.TotalPages, null) // Show last page
+    return; // Exit
+}
+
+if (pagesAfter > 4)
+{
+        @buildLinks(1, 1, null) // Show 1st pages
+    int pageSubset1 = ViewBag.CurrentPage - 7 > 1 ? ViewBag.CurrentPage - 7 : 2;
+    int pageSubset2 = ViewBag.CurrentPage + 7 < (Int16)ViewBag.TotalPages ? (Int16)ViewBag.CurrentPage + 7 : (Int16)ViewBag.TotalPages - 1;
+
+        @buildLinks(pageSubset1, pageSubset1, pageSubset1 == ViewBag.CurrentPage - 4 ? null : "...") // Show 1st page subset (...)
+                                                                                                    @buildLinks(ViewBag.CurrentPage - 3, ViewBag.CurrentPage + 3, null) // Show middle pages
+
+    // Show 2nd page subset (...)
+    // only show ... if page is contigous to the previous one.
+
+        @buildLinks(pageSubset2, pageSubset2, pageSubset2 == ViewBag.CurrentPage + 4 ? null : "...")
+        @buildLinks((Int16)ViewBag.TotalPages, (Int16)ViewBag.TotalPages, null) // Show last page
+    return; // Exit
+}
+}
+
+
+@*<link rel="stylesheet" href="../Content/datatables/dataTables.bootstrap.css">*@
+
+<div class="rle_contact_wrapper rle_toppadder90 rle_bottompadder90">
+    <div class="container">
+        @using (Html.BeginForm("NewProperty", "Properties", FormMethod.Post, new { @name = "propertyProfile", role = "form", enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="row" style="margin-top:-50px">
+
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="rle_contact_form">
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                <table id="example2" class="table table-bordered table-striped">
+                                    <tr>
+                                        <th>
+                                            @Html.DisplayNameFor(model => model.FullName)
+                                        </th>
+                                        <th>
+                                            @Html.DisplayNameFor(model => model.User.Email)
+                                        </th>
+                                        <th>
+                                            @Html.DisplayNameFor(model => model.CorporateName)
+                                        </th>
+                                        <th>
+                                            @Html.DisplayNameFor(model => model.Address)
+                                        </th>
+                                        <th>
+                                            @Html.DisplayNameFor(model => model.Phone)
+                                        </th>
+                                        <th>
+                                            @Html.DisplayNameFor(model => model.RegDate)
+                                        </th>
+                                        <th>
+                                            @Html.DisplayNameFor(model => model.Status)
+                                        </th>
+                                        <th>
+                                            Thumbnail
+                                        </th>
+                                        <th>Action</th>
+                                    </tr>
+
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.FullName)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.User.Email)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.CorporateName)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Address)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Phone)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.RegDate)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Status)
+                                            </td>
+                                            <td>
+                                                <img src="@item.ImageMainUrl" width="50" class="img-responsive" />
+                                            </td>
+                                            <td>
+                                                @if (item.Status.ToString() == "Active Verified")
+                                                {
+                                                    @Html.ActionLink("Unverify Agent", "UnverifyAgent", new { id = PropertyManagerWeb.Models.AppHandler.Encrypt(item.IDforLand.ToString()) })
+                                                }
+                                                else if ((item.Status.ToString() == "Active Unverified"))
+                                                {
+                                                    @Html.ActionLink("Verify Agent", "VerifyAgent", new { id = PropertyManagerWeb.Models.AppHandler.Encrypt(item.IDforLand.ToString()) });
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+
+                                </table>                                
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <div class="rle_pagination_wrapper">
+                                    <nav>
+
+                                        @if (Model.Count() < 1)
+                                        {
+                                            <div class="col-md-12" style="background-color:white; height:1300px">
+                                                <h5 style="text-align:center; margin-top:100px">No Agents listed yet. </h5>
+                                            </div>
+                                        }
+                                        else
+                                        {
+
+                                            int prevPage = int.Parse(ViewBag.CurrentPage.ToString()) - 1;
+                                            int nextPage = int.Parse(ViewBag.CurrentPage.ToString()) + 1;
+
+                                            <ul class="pagination">
+                                                <li style="display:@(prevPage == 0 ? "none" : "")"><a href="@Url.Action("Index", "Landlords", new { page = prevPage })"><i class="fa fa-angle-double-left" aria-hidden="true"></i></a></li>
+                                                <li>@pageLinks()</li>
+                                                <li style="display:@(ViewBag.CurrentPage == ViewBag.TotalPages ? "none" : "")"><a href="@Url.Action("Index", "Landlords", new { page = nextPage })"><i class="fa fa-angle-double-right" aria-hidden="true"></i></a></li>
+                                            </ul>
+                                        }
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+@section Scripts {
+}

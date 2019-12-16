@@ -1,0 +1,120 @@
+﻿@model PropertyManagerWeb.Models.LandlordViewModel
+
+@{
+        ViewBag.Title = "My Account : Update Profile";
+}
+
+<script>
+    //Client-side image upload preview
+    var loadFile = function (event) {
+        var output = document.getElementById('output1');
+        output.src = URL.createObjectURL(event.target.files[0]);
+    };
+</script>
+
+<div class="rle_contact_wrapper rle_toppadder90 rle_bottompadder90">
+    <div class="container">
+      @using (Html.BeginForm("Edit", "Landlords", FormMethod.Post, new { @class = "form-horizontal", role = "form", enctype = "multipart/form-data" }))
+      {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.IDforLand)
+        @Html.HiddenFor(model => model.RegDate)
+        @Html.HiddenFor(model => model.LandlordID)
+        @Html.HiddenFor(model => model.Status)
+        @Html.HiddenFor(model => model.ImageMainUrl)
+        @Html.HiddenFor(model => model.ApplicationUserId)
+
+            <div class="row" style="margin-top:-50px">
+                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                    <div class="rle_contact_info">
+                        <label>Profile Image</label>
+                        <label class="custom-file-upload">
+                            <small id="instruct2">Click to Upload a Profile Image <span class="glyphicon glyphicon-camera"></span></small>
+                            <img src="@Html.DisplayFor(model => model.ImageMainUrl)" class="img-responsive center-block" id="output1" width="300" height="300" />
+                            @Html.TextBoxFor(m => m.ImageMain, new { @type = "file", accept = "image/*", onchange = "loadFile(event)" })
+                        </label>
+                    </div>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">
+                    <div class="rle_contact_form">
+                        <div class="row">
+                            <div class="col-md-2 col-sm-2 col-xs-12">
+                                <label>Title</label>
+                                @Html.TextBoxFor(m => m.Title, new { @placeholder = "Title", @class = "form-control", @style = "margin-bottom:20px; height:50px; border-radius:0px" })
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                <label>Surname<span class="text-danger">*</span></label>
+                                @Html.TextBoxFor(m => m.Surname, new { @placeholder = "Surname", @class = "form-control", @style = "margin-bottom:20px; height:50px; border-radius:0px" })
+                            </div>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <label>Other names<span class="text-danger">*</span></label>
+                                @Html.TextBoxFor(m => m.OtherNames, new { @placeholder = "Other Names", @class = "form-control", @style = "margin-bottom:20px; height:50px; border-radius:0px" })
+                            </div>
+                            <div class="col-md-8 col-sm-8 col-xs-12">
+                                <label>Corporate Name</label>
+                                @Html.TextBoxFor(m => m.CorporateName, new { @placeholder = "Corporate Name", @class = "form-control", @style = "margin-bottom:20px; height:50px; border-radius:0px" })
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                <label>Phone Number<span class="text-danger">*</span></label>
+                                @Html.TextBoxFor(m => m.Phone, new { @placeholder = "Phone Number", @class = "form-control", @style = "margin-bottom:20px; height:50px; border-radius:0px" })
+                            </div>
+                            <div class="col-lg-6">
+                                <label>Address<span class="text-danger">*</span></label>
+                                @Html.TextAreaFor(m => m.Address, new { @rows = 4, @placeholder = "Address", @class = "form-control", @style = "margin-bottom:20px; border-radius:0px" })
+                            </div>
+                            <div class="col-lg-6">
+                                <label>Mini Biography<span class="text-danger">*</span></label>
+                                @Html.TextAreaFor(m => m.MiniBiography, new { @rows = 4, @placeholder = "Mini Biography", @class = "form-control", @style = "margin-bottom:20px; border-radius:0px" })
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                <label>Facebook</label>
+                                @Html.TextBoxFor(m => m.Facebook, new { @placeholder = "e.g: www.facebook.com/username", @class = "form-control", @style = "margin-bottom:20px; height:50px; border-radius:0px" })
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                <label>Instagram</label>
+                                @Html.TextBoxFor(m => m.Instagram, new { @placeholder = "e.g: www.instagram.com/username", @class = "form-control", @style = "margin-bottom:20px; height:50px; border-radius:0px" })
+                            </div> 
+                            <div class="col-md-2 col-sm-2 col-xs-12">
+                                <label>No. of Clients</label>
+                                @Html.TextBoxFor(m => m.HappyClients, new { @placeholder = "Number of Happy Clients", @class = "form-control", @style = "margin-bottom:20px; height:50px; border-radius:0px" })
+                            </div>
+                            <div class="col-md-2 col-sm-2 col-xs-12">
+                                <label title="Years of Experience">Yrs of Exp.</label>
+                                @Html.TextBoxFor(m => m.YearsOfExperience, new { @placeholder = "Years of experience", @class = "form-control", @style = "margin-bottom:20px; height:50px; border-radius:0px" })
+                            </div>
+                            <div class="col-lg-12">
+                                <button style=" float:right" type="submit" class="rle_btn">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    input[type="file"] {
+        display: none;
+    }
+
+    .custom-file-upload {
+        border: 1px solid #ccc;
+        display: inline-block;
+        padding: 0px 12px;
+        cursor: pointer;
+        width: 100%;
+        height: 350px;
+    }
+</style>
+@*<div>
+        @Html.ActionLink("Back to List", "Index")
+    </div>
+
+    @section Scripts {
+        @Scripts.Render("~/bundles/jqueryval")
+    }*@
+
+@section Scripts { 
+} 

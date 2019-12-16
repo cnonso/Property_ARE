@@ -1,0 +1,50 @@
+﻿@model IEnumerable<PropertyManagerWeb.Models.Landlord>
+@using PropertyManagerWeb.Models;
+@{
+    ViewBag.Title = "Verified Agents";
+}
+
+<!-- Team Wrapper start -->
+<div class="rle_team_wrapper rle_toppadder100 rle_bottompadder70">
+    <div class="container">
+        <div class="row">
+@if (Model.Count() == 0)
+{
+    <h3>No Verified Agent Yet</h3>
+}
+else
+{
+    foreach (var item in Model)
+    {
+            <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                <div class="rle_team_box">
+                    @if (item.ImageMainUrl == null)
+                    {<a href="@Url.Action("Agents-Property-Listing", "Properties", new { id = AppHandler.Encrypt(item.LandlordID), name = item.FullName })"> <img src="~/Images/user-512.png" alt=" " width="270" height="340" class="img-responsive"></a>}
+                    else
+                    {<a href="@Url.Action("Agents-Property-Listing", "Properties", new { id = AppHandler.Encrypt(item.LandlordID), name = item.FullName })"><img src="@Html.DisplayFor(modelItem => item.ImageMainUrl)" alt=" " width="270" height="340"  class="img-responsive"></a>}
+                    <div class="rle_team_box_info">
+                        <h4>@Html.DisplayFor(modelItem => item.FullName)</h4>
+                        <p>Agent</p>
+                    </div>
+                    <div class="rle_team_box_open">
+                        @{ 
+                            string email = new DB().ReadData("Select Email from AspNetUsers where Id = '" + item.ApplicationUserId + "'");
+                        }
+                        <p><i class="fa fa-phone" aria-hidden="true"></i> @Html.DisplayFor(modelItem => item.Phone)</p>
+                        <p><i class="fa fa-envelope-o" aria-hidden="true"></i> @email</p>
+                        <ul>
+                            <li><a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+                            <li><a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+                            <li><a href="#"><i class="fa fa-pinterest-p" aria-hidden="true"></i></a></li>
+                            <li><a href="#"><i class="fa fa-instagram" aria-hidden="true"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+    }
+} 
+        </div>
+    </div>
+</div>
+@section Scripts { 
+}

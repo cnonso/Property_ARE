@@ -1,0 +1,370 @@
+﻿@model PropertyManagerWeb.Models.MultipleModels
+
+@{
+    ViewBag.Title = "Property Details";
+}
+<link href="~/css/bootstrap.css" rel="stylesheet" type="text/css" media="all" />
+<link rel="stylesheet" type="text/css" href="~/css/zoomslider.css" />
+<link rel="stylesheet" type="text/css" href="~/css/style.css" />
+<link rel="stylesheet" type="text/css" href="~/css/component.css" />
+<script type="text/javascript" src="~/js/modernizr-2.6.2.min.js"></script>
+<!--/web-fonts-->
+<link href="~/css/font-awesome.min.css" rel="stylesheet" type="text/css" media="all" />
+<link href='//fonts.googleapis.com/css?family=Open+Sans:400,600,600italic,300,300italic,700,400italic' rel='stylesheet' type='text/css'>
+<link href='//fonts.googleapis.com/css?family=Wallpoet' rel='stylesheet' type='text/css'>
+<link href='//fonts.googleapis.com/css?family=Ubuntu:400,500,700,300' rel='stylesheet' type='text/css'>
+<!--//web-fonts-->
+<script type="application/x-javascript">
+    addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false);
+           function hideURLbar(){ window.scrollTo(0,1); } </script>
+
+<!-- Property Single Wrapper start -->
+<div class="rle_property_single_wrapper rle_bottompadder70">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
+                <div class="rle_property_single_heading">
+                    <div class="rle_property_details_box col-md-6" style="">
+                        <div class="row">
+                            <div class="col-md-7">
+                                <h2>@Html.DisplayFor(model => model.Property.Name) <sup style="background-color: @(Model.Property.Category == "For Sale" ? "" : "limegreen" )">@Html.DisplayFor(model => model.Property.Category)</sup></h2>
+                                <p> @Html.DisplayFor(model => model.Property.Address)</p>
+                                @{Session["Location"] = Model.Property.Location;}
+                            </div>
+                            <div class="col-md-5">
+                                <span>
+                                    @Html.Partial("_VoteShow")
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <img style="margin-top:-30px" src="@Html.DisplayFor(model => model.Property.ImageMainUrl)" width="800" />
+                </div>
+
+                <div class="rle_property_details_box">
+                    <h3>Property description</h3>
+                    <p>@Html.DisplayFor(model => model.Property.PlainDescription)</p>
+
+                </div>
+
+                <div class="rle_property_details_box">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h3>View on map</h3>
+                            </div>
+                            <div class="col-md-12">
+                                <div id="googleMap" style="height:350px; border:thin; padding-left:20px"></div>
+                            </div>
+
+                            @if (Html.DisplayFor(model => model.Property.CoordinateLat).ToString() == "0")
+                            {
+                                <script>
+                                    var gmarkers = [];
+                                    function myMap() {
+                                        var mapCanvas = document.getElementById("googleMap");
+                                        var myCenter = new google.maps.LatLng(6.221107955334719, 7.082233428955078);
+                                        var mapOptions = { center: myCenter, zoom: 12, mapTypeId: google.maps.MapTypeId.ROADMAP };
+                                        var map = new google.maps.Map(mapCanvas, mapOptions);
+
+
+                                        google.maps.event.addListener(map, 'click', function (event) {
+                                            placeMarker(map, event.latLng);
+                                        });
+
+                                        google.maps.event.addListener(window, 'load', function (event) {
+                                            placeMarker(map, event.latLng);
+                                        });
+                                    }
+
+                                    function placeMarker(map, location) {
+                                        var marker = new google.maps.Marker({
+                                            position: location,
+                                            map: map
+                                        });
+
+                                        var infowindow = new google.maps.InfoWindow({
+                                            content: 'Latitude: ' + location.lat() + '<br>Longitude: ' + location.lng()
+                                        });
+                                        infowindow.open(map, marker);
+
+                                        // Push every newly created marker into the array:
+                                        gmarkers.push(marker);
+                                        marker.addListener("click", function () {
+                                            //marker.setMap(null);
+                                            for (i = 0; i < gmarkers.length; i++) {
+                                                gmarkers[i].setMap(null);
+                                            }
+                                            document.propertyProfile.CoordinateLat.value = "";
+                                            document.propertyProfile.CoordinateLong.value = "";
+                                        });
+
+                                        document.propertyProfile.CoordinateLat.value = location.lat();
+                                        document.propertyProfile.CoordinateLong.value = location.lng()
+                                    }
+
+                                    function removeMarkers() {
+                                        for (i = 0; i < gmarkers.length; i++) {
+                                            gmarkers[i].setMap(null);
+                                        }
+                                    }
+                                </script>
+                            }
+                            else
+                            {
+                                <script>
+                                    var gmarkers = [];
+                                    function myMap() {
+                                        var mapCanvas = document.getElementById("googleMap");
+                                        var myCenter = new google.maps.LatLng(6.221107955334719, 7.082233428955078);
+                                        var mapOptions = { center: myCenter, zoom: 12, mapTypeId: google.maps.MapTypeId.ROADMAP };
+                                        var map = new google.maps.Map(mapCanvas, mapOptions);
+                                        google.maps.event.addListener(map, 'click', function (event) {
+                                            placeMarker(map, event.latLng);
+                                        });
+                                    }
+
+                                    function placeMarker(map, location) {
+                                        var marker = new google.maps.Marker({
+                                            position: location,
+                                            map: map
+                                        });
+
+                                        var infowindow = new google.maps.InfoWindow({
+                                            content: 'Latitude: ' + location.lat() + '<br>Longitude: ' + location.lng()
+                                        });
+                                        infowindow.open(map, marker);
+
+                                        // Push every newly created marker into the array:
+                                        gmarkers.push(marker);
+                                        marker.addListener("click", function () {
+                                            //marker.setMap(null);
+                                            for (i = 0; i < gmarkers.length; i++) {
+                                                gmarkers[i].setMap(null);
+                                            }
+                                            document.propertyProfile.CoordinateLat.value = "";
+                                            document.propertyProfile.CoordinateLong.value = "";
+                                        });
+
+                                        document.propertyProfile.CoordinateLat.value = location.lat();
+                                        document.propertyProfile.CoordinateLong.value = location.lng()
+                                    }
+
+                                    function removeMarkers() {
+                                        for (i = 0; i < gmarkers.length; i++) {
+                                            gmarkers[i].setMap(null);
+                                        }
+                                    }
+                                </script>
+                            }
+                            <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCmlb220Er3NeKZBpMRdQH07y0LgKQYbWc&callback=myMap"
+                                    type="text/javascript"></script>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                <div class="rle_property_details_box">
+
+                    <div class="user_info">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <h3>Update Property Info</h3><br />
+                            @if (Session["Message"] != null)
+                            {
+                                <span style="color:red">
+                                    @Session["Message"].ToString()
+                                </span>
+                            }
+                        </div>
+                    </div>
+                    <div class="user_info_form">
+                        @using (Html.BeginForm("Update", "Properties", FormMethod.Post, new { @name = "propertyProfile", role = "form", enctype = "multipart/form-data" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            @Html.HiddenFor(model => model.Property.PropertyID)
+                            @Html.HiddenFor(model => model.Property.LandlordID)
+                            @Html.HiddenFor(model => model.Property.RegDate)
+                            @Html.HiddenFor(model => model.Property.Commission)
+                            @Html.HiddenFor(model => model.Property.RemittancePref)
+                            @Html.HiddenFor(model => model.Property.Description)
+
+                            @Html.HiddenFor(model => model.Property.AvailableUnits)
+                            @Html.HiddenFor(model => model.Property.Status)
+                            @Html.HiddenFor(model => model.Property.ImageMainUrl)
+                            @Html.HiddenFor(model => model.Property.Image1Url)
+                            @Html.HiddenFor(model => model.Property.Image2Url)
+                            @Html.HiddenFor(model => model.Property.Image3Url)
+                            @Html.HiddenFor(model => model.Property.Image4Url)
+                            @Html.HiddenFor(model => model.Property.Image5Url)
+                            @Html.HiddenFor(model => model.Property.CoordinateLat)
+                            @Html.HiddenFor(model => model.Property.CoordinateLong)
+                            @Html.HiddenFor(model => model.Property.Votes)
+                            @Html.HiddenFor(model => model.Property.VoteId)
+
+                            @Html.HiddenFor(model => model.Property.SectionId)
+                            @Html.HiddenFor(model => model.Property.TotalVotes)
+                            @Html.HiddenFor(model => model.Property.Featured)
+                            @Html.HiddenFor(model => model.Property.PropertyType)
+                            @Html.HiddenFor(model => model.Property.Category)
+                            @Html.HiddenFor(model => model.Property.ParkingLot)
+
+                            <div class="col-md-12">
+                                <label>Category</label>
+                                @Html.DropDownListFor(x => x.SelectedPropertyCategory, Model.PropertyCategories, new {@id="propertyCategory", @class = "form-control", @style = "margin-bottom:20px; height:50px; border-radius:0px; background-color:whitesmoke", @onchange = "toggleDisplay(this.value);" })
+
+                                <script>
+                                    function toggleDisplay(value) {
+                                        if (value == "For Rent") {
+                                            document.getElementById('perYr').style.display = "inline-block";
+                                        }
+                                        else if (value == "For Sale") {
+                                            document.getElementById('perYr').style.display = "none";
+                                        }
+                                    }
+                                </script>
+                                <script>
+                                    window.onload = function () {
+                                        var category = document.getElementById('propertyCategory').value;
+                                        if (category == "For Rent") {
+                                            document.getElementById('perYr').style.display = "inline-block";
+                                        }
+                                        else if (category == "For Sale") {
+                                            document.getElementById('perYr').style.display = "none";
+                                        }
+                                    };
+                                </script>
+                            </div>
+                            <div class="col-md-12">
+                                <label>Title</label>
+                                @Html.TextBoxFor(m => m.PropertyViewModel.Name, new { @placeholder = "Property Name", @class = "form-control", @style = "margin-bottom:20px; height:50px; border-radius:0px" })
+                            </div>
+
+                            <div class="col-md-12">
+                                <label>Property Type</label>
+                                @Html.DropDownListFor(x => x.SelectedPropertyType, Model.PropertyTypes, new { @class = "form-control", @style = "margin-bottom:20px; height:50px; border-radius:0px; background-color:whitesmoke" })
+                                @Html.ValidationMessageFor(model => model.PropertyViewModel.PropertyType, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="col-md-12">
+                                <label>Description</label>
+                                @Html.TextAreaFor(m => m.PropertyViewModel.PlainDescription, new { @rows = 3, @placeholder = "Address", @class = "form-control", @style = "margin-bottom:20px; border-radius:0px" })
+                                @Html.ValidationMessageFor(model => model.PropertyViewModel.PlainDescription, "", new { @class = "text-danger" })
+                            </div>
+
+                                <div class="col-md-12">
+                                    <label>Address</label>
+                                    @Html.TextAreaFor(m => m.PropertyViewModel.Address, new { @rows = 3, @placeholder = "Address", @class = "form-control", @style = "margin-bottom:20px; border-radius:0px" })
+                                    @Html.ValidationMessageFor(model => model.PropertyViewModel.Address, "", new { @class = "text-danger" })
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label>Price <i id="perYr" style="color:red; display:inline-block"> (per year)</i></label>
+                                    @Html.TextBoxFor(m => m.PropertyViewModel.RentAmount, new { @placeholder = "Price", @class = "form-control", @style = "margin-bottom:20px; height:50px; border-radius:0px" })
+                                    @Html.ValidationMessageFor(model => model.PropertyViewModel.RentAmount, "", new { @class = "text-danger" })
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label>Town </label>
+                                    @Html.DropDownListFor(x => x.SelectedLocation, Model.Locations, new { @class = "form-control", @style = "margin-bottom:20px; height:50px; border-radius:0px; background-color:whitesmoke" })
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label>Beds </label>
+                                    @Html.DropDownListFor(x => x.SelectedBed, Model.Beds, new { @class = "form-control", @style = "margin-bottom:20px; height:50px; border-radius:0px; background-color:whitesmoke" })
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label>Baths </label>
+                                    @Html.DropDownListFor(x => x.SelectedBath, Model.Baths, new { @class = "form-control", @style = "margin-bottom:20px; height:50px; border-radius:0px; background-color:whitesmoke" })
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label>Parking</label>
+                                    @Html.DropDownListFor(x => x.SelectedParkingType, Model.ParkingType, new { @class = "form-control", @style = "margin-bottom:20px; height:50px; border-radius:0px; background-color:whitesmoke" })
+                                    
+                                </div>
+                                <div class="col-md-12">
+                                    <label style="margin-top:20px">Property Image:</label>
+                                    <label class="custom-file-upload">
+                                        <small id="instruct">Upload <span class="glyphicon glyphicon-camera"></span></small>
+                                        <img class="img-responsive center-block" id="output1" width="300" />
+                                        @Html.TextBoxFor(m => m.PropertyViewModel.ImageMain, new { @type = "file", accept = "image/*", onchange = "loadFile(event)" })
+                                        @*<input name="LogoImage" type="file" accept="image/*" onchange="loadFile(event)" />*@
+                                    </label>
+
+                                    <style>
+                                        input[type="file"] {
+                                            display: none;
+                                        }
+
+                                        .custom-file-upload {
+                                            border: 1px solid #ccc;
+                                            display: inline-block;
+                                            padding: 0px 12px;
+                                            cursor: pointer;
+                                            width: 100%;
+                                            height: 300px;
+                                        }
+                                    </style>
+                                    <script>
+                                        //Client-side image upload preview
+                                        var loadFile = function (event) {
+                                            var output = document.getElementById('output1');
+                                            output.src = URL.createObjectURL(event.target.files[0]);
+
+                                            var instruct = document.getElementById('instruct');
+                                            instruct.style.display = 'none';
+                                        };
+
+                                        var loadFile2 = function (event) {
+                                            var output2 = document.getElementById('output2');
+                                            output2.src = URL.createObjectURL(event.target.files[0]);
+
+                                            var instruct2 = document.getElementById('instruct2');
+                                            instruct2.style.display = 'none';
+                                        };
+                                        var loadFile3 = function (event) {
+                                            var output3 = document.getElementById('output3');
+                                            output3.src = URL.createObjectURL(event.target.files[0]);
+
+                                            var instruct3 = document.getElementById('instruct3');
+                                            instruct3.style.display = 'none';
+                                        };
+                                        var loadFile4 = function (event) {
+                                            var output4 = document.getElementById('output4');
+                                            output4.src = URL.createObjectURL(event.target.files[0]);
+
+                                            var instruct4 = document.getElementById('instruct4');
+                                            instruct4.style.display = 'none';
+                                        };
+
+                                    </script>
+
+                                    <label style="margin-top:20px">Location: <small style="color: #f75b1f">Select from the map displayed</small></label>
+                                    <div style="display:none">
+                                        <input type="text" id="coordinate" name="CoordinateLat" placeholder="0.00000...">
+                                        <input style="margin-top:20px" type="text" id="coordinate" name="CoordinateLong" placeholder="0.00000...">
+                                    </div>
+                                </div>
+
+                                    <button type="submit" onclick="showMessageProgress();" class="rle_btn">Update</button>
+                                        <script>
+                                            function showMessageProgress() {
+                                                if (document.getElementById('sender_name').value.length > 0 | document.getElementById('messageBody').value.length > 0) {
+                                                    document.getElementById("messageSendingStatus").style.display = "block";
+                                                }
+                                                //setTimeout(function(){ document.getElementById("messageSendingStatus").style.display = "none"; }, 6000);
+                                            };
+                                        </script>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+}

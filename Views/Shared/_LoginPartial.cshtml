@@ -1,0 +1,35 @@
+﻿
+@if (Request.IsAuthenticated)
+{
+    using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+    {
+        @Html.AntiForgeryToken()
+        <ul style="float:right">
+            <li>
+                @*@Html.ActionLink("Hello " + User.Identity.GetUserName() + "!", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })*@
+                <a href="#">My Account</a>
+                <ul class="sub-menu">
+                    <li>@Html.ActionLink("Change Password", "ChangePassword", "Manage")</li>
+                    <li>@Html.ActionLink("Update Profile", "Edit", "Landlords")</li>
+                    <li>@Html.ActionLink("My Listing", "My-Property-Listing", "Properties")</li>
+                    <li>@Html.ActionLink("My Messages", "My-Messages", "Landlords")</li>
+                </ul>
+            </li>
+            <li><a href="javascript:document.getElementById('logoutForm').submit()">Log off</a></li>
+        </ul>
+    }
+}
+else
+{
+
+    <div class="rle_signin">
+        @Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { @class = "rle_btn", @id = "login_button", @style = "background-color:orange; border-color:orange" })
+        @Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { @class = "rle_btn", @id = "login_button" })
+        @*<a href="#" class="rle_btn" id="login_button">sign in</a>*@
+        <ul style="display:none">
+            <li>@Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })</li>
+            <li>@*@Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })*@</li>
+            <li><a href="#" class="rle_btn" id="login_button">sign in</a></li>
+        </ul>
+    </div>
+}

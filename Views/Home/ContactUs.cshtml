@@ -1,0 +1,62 @@
+﻿@model PropertyManagerWeb.Models.SiteMessageViewModel
+@{
+    ViewBag.Title = "ContactUs";
+}
+
+<div class="rle_contact_wrapper rle_toppadder90 rle_bottompadder90">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="rle_contact_info">
+                    <h2>Get in touch</h2>
+                    <p>If you’d like to get in touch, send us a message or simply contact us directly using the details below.</p>
+                    <ul>
+                        <li>
+                            <h4>Phone</h4>
+                            <p>(+234) 08038466464</p>
+                        </li>
+                        <li>
+                            <h4>Email</h4>
+                            <p>Info@Anambrarealestate.com</p>
+                        </li>
+                        <li>
+                            <h4>Location</h4>
+                            <p>PeacKastel Plaza Opposite Old INEC Office Okpuno Road, Awka</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="rle_contact_form">
+                    <div class="row">
+                        @using (Html.BeginForm("ContactUs", "Home", FormMethod.Post, new {@id="Contact_Form", @name = "MessageForm", role = "form" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                @Html.TextBoxFor(m => m.SenderName, new { @id = "sender_name", @placeholder = "Your Name", @required = "required" })
+                                @Html.ValidationMessageFor(model => model.SenderName, "", new { @class = "text-danger" })
+
+                            </div>
+
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                @Html.TextBoxFor(m => m.Email, new { @placeholder = "Email" })
+                                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-lg-12">
+                                @Html.TextAreaFor(m => m.MessageBody, new { @id = "messageBody", @placeholder = "Message", @required = "required", @rows = "8" })
+                                @Html.ValidationMessageFor(model => model.MessageBody, "", new { @class = "text-danger" })
+
+                            </div>
+                            <div class="col-lg-12">
+                                @*<a href="javascript:document.getElementById('Contact_Form').submit()" class="rle_btn">Send message</a>*@
+                                <a style="cursor:pointer" class="rle_btn">Send message</a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

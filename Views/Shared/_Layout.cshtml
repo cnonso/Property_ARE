@@ -1,0 +1,235 @@
+﻿<!DOCTYPE html>
+<!--
+Template Name: Real Estate
+Version: 1.0.0
+-->
+<!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+<!--<![endif]-->
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewBag.Title - Anambra Real Estate</title>
+    @*@Styles.Render("~/Content/css")
+        @Scripts.Render("~/bundles/modernizr")*@
+    @using Microsoft.AspNet.Identity;
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta name="description" content="Real Estate" />
+    <meta name="keywords" content="Real Estate, Property template, Real Estate template, rent, sale, buy" />
+    <meta name="author" content="" />
+    <meta name="MobileOptimized" content="320" />
+
+    <!--Facebook Share Tool-->
+    <meta property="og:url" content="http://www.anambrarealestate.com" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Anambra Real Estate" />
+    <meta property="og:description" content="Real Estate Management Site" />
+    <meta property="og:image" content="http://www.anambrarealestate.com/Images/asre_logo_.png" />
+
+
+    <!--srart theme style -->
+    <link href="~/css/bootstrap.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="~/css/font-awesome.css" />
+    <link rel="stylesheet" type="text/css" href="~/css/fonts.css" />
+    <link rel="stylesheet" type="text/css" href="~/css/owl.carousel.css" />
+    <link rel="stylesheet" type="text/css" href="~/css/owl.theme.default.css" />
+    <link rel="stylesheet" type="text/css" href="~/css/jquery-ui.css" />
+    <link rel="stylesheet" type="text/css" href="~/css/style.css" />
+    <!-- favicon links -->
+    <link rel="shortcut icon" type="image/png" href="~/images/header/favicon.ico" />
+</head>
+<body>
+    <!-- Load Facebook SDK for JavaScript -->
+    <div id="fb-root"></div>
+    <script>
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));</script>
+
+    <div class="rle_banner_wrapper style_4">
+        <div class="rle_header_wrapper style_4">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                        <div class="rle_logo" style="margin-top:10px">
+                            <a href="#"><img src="~/images/icon/asre_logo_.png" alt="Logo" title="Logo"></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
+                        <button class="rle_menu_btn"><i class="fa fa-bars" aria-hidden="true"></i></button>
+                        <div class="rle_main_menu_wrapper" style="width:80% ">
+                            <div class="rle_main_menu">
+
+                                <ul>
+                                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                                    <li style="margin-left:-15px">@Html.ActionLink("Property Listing", "Property Listing", "Properties")
+                                        <ul class="sub-menu">
+                                            <li>@Html.ActionLink("Regular", "Property Listing", "Properties")</li>
+                                            <li>@Html.ActionLink("Featured", "Featured-Property-Listing", "Properties")</li>
+                                        </ul>
+                                    </li>
+                                    <li style="margin-left:-15px">@Html.ActionLink("Verified Agents", "Verified Agents", "Properties")</li>
+                                    @if (!Request.IsAuthenticated)
+                                    {
+                                        <li style="margin-left:-15px">@Html.ActionLink("Blog", "Blog Posts", "Home")</li>
+                                    }
+                                    @{
+                                        string userID = User.Identity.GetUserId();
+                                        string userType = new PropertyManagerWeb.Models.DB().ReadData("Select UserType From AspNetUsers where Id = '" + userID + "'");
+                                        if (userType.Trim() == "Landlord")
+                                        {
+                                            <li style="margin-left:-15px">@Html.ActionLink("Blog", "Blog Posts", "Home")</li>
+                                            <li style="margin-left:-15px">
+                                                <a href="#">My Account</a>
+                                                <ul class="sub-menu">
+                                                    <li>@Html.ActionLink("Change Password", "ChangePassword", "Manage")</li>
+                                                    <li>@Html.ActionLink("Update Profile", "Edit", "Landlords")</li>
+                                                    <li>@Html.ActionLink("My Listing", "My-Property-Listing", "Properties")</li>
+                                                    <li>@Html.ActionLink("My Messages", "My-Messages", "Landlords")</li>
+                                                </ul>
+                                            </li>
+                                        }
+                                        if (userType.Trim() == "Admin")
+                                        {
+                                            <li style="margin-left:-15px">@Html.ActionLink("All Agents", "Index", "Landlords")</li>
+                                            <li style="margin-left:-15px">
+                                                @Html.ActionLink("Blog", "Blog Posts", "Home")
+                                                <ul class="sub-menu">
+                                                    <li>@Html.ActionLink("Create Topic", "Create Blog", "Home")</li>
+                                                </ul>
+                                            </li>
+                                        }
+                                        if (Request.IsAuthenticated)
+                                        {
+                                            using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { @id = "logoutForm_", @class = "navbar-right_" }))
+                                            {
+                                                @Html.AntiForgeryToken()
+
+                                            }
+                                        }
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                        @if (!Request.IsAuthenticated)
+                        {
+                            <div class="rle_signin">
+                                @Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { @class = "rle_btn", @id = "reg_button", @style = "background-color:orange; border-color:orange" })
+                                @Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { @class = "rle_btn", @id = "login_button" })
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="rle_signin">
+                                <a class="rle_btn" id="myAccount_button" style="background-color:orange; border-color:orange;" onmouseover="document.getElementById('myAccount_button').style.color = 'orange'" onmouseout="document.getElementById('myAccount_button').style.color = 'white'" href="@Url.Action("NewProperty", "Properties")">Post Property</a>
+                                <a class="rle_btn" id="login_button" href="javascript:document.getElementById('logoutForm_').submit()">Log off</a>
+                            </div>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    <!-- Breadcrumb Wrapper start -->
+    <div id="breadcrumb" class="rle_pagetitle_wrapper rle_toppadder40 rle_bottompadder40">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="page_title">
+                        <h2><span>@ViewBag.AgentName </span><span>@ViewBag.PreHeading</span>@ViewBag.Title</h2>
+                    </div>
+                    <ul class="breadcrumb">
+                        <li><a href="@Url.Action("Index", "Home")"><i class="fa fa-home" aria-hidden="true"></i> home</a></li>
+                        <li><i class="fa fa-angle-right" aria-hidden="true"></i></li>
+                        <li><a href="#"><span>@ViewBag.AgentName </span><span>@ViewBag.PreHeading</span>@ViewBag.Title</a></li> 
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    @RenderBody()
+    <!-- Footer Wrapper start -->
+    <div class="rle_footer_wrapper rle_toppadder100" style="background: url(/images/map.png) 0 0;">
+        <div class="container">
+            <div class="row">
+                <div class="rle_top_footer">
+                    <div class="col-lg-4 col-md-4 col-sm-12">
+                        <div class="widget text-widget">
+                            <img src="~/images/icon/a_logo_white_fit.png" alt="Footer Logo" />
+                            <p class="rle_footertext">Anambra Real Estate is No 1 Property portal and has been adjudged as the most preferred by independent surveys the portal provides a platform for property.</p>
+                            <a href="@Url.Action("ContactUs","Home")" class="rle_btn">Contact us today</a>
+                            @if (Request.IsAuthenticated && User.Identity.GetUserId() == "c15dc77d-01c4-4394-8c33-fc9f38fe19b1")
+                            {
+                                <a href="#" class="rle_btn">Messages</a>
+                            }
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-12">
+                        <div class="widget text-widget">
+                            <h4 class="widget-title">Company</h4>
+                            <ul>
+                                <li><a href="#">Browse Properties</a></li>
+                                <li><a href="#">Landlords</a></li>
+                                <li><a href="#">Renters</a></li>
+                                <li><a href="#">Services</a></li>
+                                <li><a href="#">Pricing</a></li>
+                                <li><a href="#">Contact Us</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-12">
+                        <div class="widget text-widget">
+                            <h4 class="widget-title">Support</h4>
+                            <ul>
+                                <li><a href="#">Help & FAQ</a></li>
+                                <li><a href="#">Contact Us</a></li>
+                                <li><a href="#">Privacy Policy</a></li>
+                                <li><a href="#">Careers</a></li>
+                                <li><a href="#">Our Partners</a></li>
+                                <li><a href="#">Term & Services</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-12">
+                        <div class="widget text-widget">
+                            <h4 class="widget-title">Reach out</h4>
+                            <ul>
+                                <li><p><i class="fa fa-map-marker" aria-hidden="true"></i> PeaceKastel Plaza Opposite Old INEC Office <br /> Okpuno Road, Awka</p></li>
+                                <li><p><i class="fa fa-envelope-open-o" aria-hidden="true"></i> <a href="#">info@anambrarealestate.com</a></p></li>
+                                <li><p><i class="fa fa-phone" aria-hidden="true"></i> (+234) 08038466464</p></li>
+                            </ul>
+                            <ul class="rle_social_iicon">
+                                <li><a href="https://web.facebook.com/anambrarealestate" target="_blank"><img src="~/images/icon/ftr_scl1.png" alt="" title=""></a></li>
+                                <li><a href="https://twitter.com/Anambraestate" target="_blank"><img src="~/images/icon/ftr_scl2.png" alt="" title=""></a></li>
+                                <li><a href="#"><img src="~/images/icon/ftr_scl3.png" alt="" title=""></a></li>
+                                <li><a href="#"><img src="~/images/icon/ftr_scl4.png" alt="" title=""></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="rle_bottom_footer">
+                    <p>Copyright © @DateTime.Now.Year <a href="http://www.anambrarealestate.com">Anambra Real Estate.</a> All Rights Reserved. Powered by <a href="http://www.pixelssolution.com"> <span>Pixels Solution Ltd.</span></a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--main js file start-->
+    <script type="text/javascript" src="../js/jquery.js"></script>
+    <script type="text/javascript" src="../js/bootstrap.js"></script>
+    <script type="text/javascript" src="../js/owl.carousel.js"></script>
+    <script type="text/javascript" src="../js/jquery-ui.js"></script>
+    <script type="text/javascript" src="../js/custom.js"></script>
+    <!--main js file end-->
+    @*@Scripts.Render("~/bundles/jquery")
+        @Scripts.Render("~/bundles/bootstrap")
+        @RenderSection("scripts", required: false)*@
+    @RenderSection("scripts", required: false)
+
+
+</body>
+</html>

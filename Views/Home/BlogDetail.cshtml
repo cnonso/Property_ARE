@@ -1,0 +1,265 @@
+﻿@model PropertyManagerWeb.Models.MultipleModels
+@using Microsoft.AspNet.Identity;
+@{
+    ViewBag.Title = ViewBag.BlogTitle;
+    string userid = User.Identity.GetUserId();
+    string userType = new PropertyManagerWeb.Models.DB().ReadData("select usertype from aspnetusers where id = '" + userid + "'");
+}
+<script type="application/x-javascript">
+    addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false);
+           function hideURLbar(){ window.scrollTo(0,1); }
+</script>
+
+<script>
+    window.onload = function () {
+        document.getElementById('breadcrumb').style.display = 'none';
+    };
+</script>
+<!-- Breadcrumb Wrapper start -->
+<div class="rle_pagetitle_wrapper style_2 rle_toppadder30 rle_bottompadder30">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="page_title">
+                    <h2>@ViewBag.Title</h2>
+                </div>
+                <ul class="breadcrumb">
+                    <li><a href="@Url.Action("Index","Home")"><i class="fa fa-home" aria-hidden="true"></i> home</a></li>
+                    <li><i class="fa fa-angle-right" aria-hidden="true"></i></li>
+                    <li><a href="@Url.Action("Index","Home")">Blog</a></li>
+                    <li><i class="fa fa-angle-right" aria-hidden="true"></i></li>
+                    <li><a href="#">@ViewBag.Title</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Blog Wrapper start -->
+<div class="rle_blog_wrapper rle_toppadder100 rle_bottompadder100">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+                <div class="rle_blog_single_item rle_bottompadder30">
+                    <div class="rle_blog_image">
+                        <img width="770" class="img-responsive" src="@Html.DisplayFor(model => model.Blog.ImageUrl)" alt="@Html.DisplayFor(model => model.Blog.Title)">
+                    </div>
+                    <div class="rle_blog_single_info">
+                        <h2>@Html.DisplayFor(model => model.Blog.Title)</h2>
+                        <ul class="rle_posted_by">
+                            <li><img src="~/Images/People/avatar.png" width="45" /></li>
+                            <li><span>by</span><a href="#">Admin</a></li>
+                            <li>
+                                <span>Posted</span>
+                                <a href="#">
+                                    Posted On
+                                    @{ DateTime postedDate = Convert.ToDateTime(Model.Blog.DatePosted);}
+                                    @String.Format("{0:dddd, MMMM d, yyyy}", postedDate)
+                                </a>
+                            </li>
+                        </ul>
+                        <ul class="rle_post_share" style="display:block">
+                            <li class="google_plus"><i class="fa fa-google-plus" aria-hidden="true"></i><a href="#">Share on Google +</a></li>
+                            <li class="facebook">
+                                <i class="fa fa-facebook" aria-hidden="true"></i>
+                                <span class="fb-share-button" data-href="http://anambrarealestate.com/bdetail.php?prop=cb9762cf" data-layout="button_count" data-size="small" data-mobile-iframe="true"><a class="fb-xfbml-parse-ignore" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fanambrarealestate.com%2Fbdetail.php%3Fprop%3Dcb9762cf&amp;src=sdkpreparse">Share On Facebook</a></span>
+
+                            </li>
+                            
+                            <li class="facebook" style="background-color:limegreen"><i class="fa fa-whatsapp" aria-hidden="true"></i><a href="http://web.whatsapp://send?text=@Model.Blog.Body">Share on Whatsapp</a></li>
+                            
+                        </ul>
+                        @{ string blog_body = Model.Blog.Body.ToString(); }
+                        <span class="rle_bottompadder20" style="text-align:justify">@Html.Raw(blog_body)</span>
+                        <ul class="rle_categories">
+                            <li>Real estate</li>
+                            <li>Housing</li>
+                            <li>Property</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="rle_blog_comment_wrapper rle_bottompadder30">
+                    <h4>@ViewBag.CommentsCount Comment(s)</h4>
+
+                    <ul>
+                        @if (Model.BlogComments.Count() == 0)
+                        {
+                            <text>No Comments</text>
+                        }
+                        else
+                        {
+                            foreach (var item in Model.BlogComments)
+                            {
+                                if (item.Status == "Shown")
+                                {
+                                    <li>
+                                        <div class="rle_blog_comment">
+                                            <div class="rle_comment_image">
+                                                <img src="~/Images/People/avatar2.png" width="45" />
+                                            </div>
+                                            <div class="rle_comment_text">
+                                                <h5>
+                                                    @Html.DisplayFor(modelItem => item.Name)
+                                                    <i style="color:cornflowerblue">(@Html.DisplayFor(modelItem => item.Email))
+                                                    </i>
+                                                    <span>
+                                                        On @String.Format("{0:dddd, MMMM d, yyyy}", item.DatePosted.Value)
+                                                    </span>
+                                                    @if (userType == "Admin")
+                                                    {
+                                                        <span style="float:right; color:red"><a style="color:white; padding-left:4px;padding-right:4px; background-color:red" href="@Url.Action("HideComment", "Home", new { id = item.Id })">Hide</a></span>
+                                                    }
+                                                </h5>
+                                                @{ string blog_comment_body = item.Content; }
+                                                <span style="text-align:justify">@Html.Raw(blog_comment_body)</span>
+
+                                            </div>
+                                        </div>
+                                    </li>
+                                                    }
+                                                    else if (item.Status == "Hidden")
+                                                    {
+                                                        <li>
+                                                            <div class="rle_blog_comment">
+                                                                <div class="rle_comment_image">
+                                                                    <img src="~/Images/People/avatar2.png" width="45" />
+                                                                </div>
+                                                                <div class="rle_comment_text">
+                                                                    <h5>
+                                                                        This comment has been hidden
+                                                                        @if (userType == "Admin")
+                                                                        {
+                                                                            <span style="float:right; color:red"><a style="color:white; padding-left:4px;padding-right:4px; background-color:limegreen" href="@Url.Action("ShowComment", "Home", new { id = item.Id  })">Show</a></span>
+                                                                        }
+                                                                    </h5>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                            }
+                                                        }
+                                                    }
+                    </ul>
+                </div>
+
+                <div class="rle_blog_message_wrapper">
+                    <h4>Your Comment</h4>
+                    <div class="rle_blog_messages rle_toppadder30">
+                        <div class="row">
+                            @using (Html.BeginForm("PostComment", "Home", new { id = Model.Blog.ID }))
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.ValidationSummary(true)
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    @Html.TextBoxFor(m => m.BlogCommentsViewModel.Name, new { @class = " ", @placeholder = "Your Name", @required="required" })
+                                    @Html.ValidationMessageFor(m => m.BlogCommentsViewModel.Name, "", new { @class = "text-danger" })
+                                </div>
+
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    @Html.TextBoxFor(m => m.BlogCommentsViewModel.Email, new { @class = " ", @placeholder = "Email Address", @type = "email" })
+                                </div>
+                                <div class="col-lg-12">
+                                    @Html.TextAreaFor(m => m.BlogCommentsViewModel.Content, new { @rows = 5, @placeholder = "Message" })
+                                    @Html.ValidationMessageFor(m => m.BlogCommentsViewModel.Content, "", new { @class = "text-danger" })
+                                    <input style="border-color:lightgray" name="blog_id" type="hidden" value="@Html.DisplayFor(m=>m.Blog.ID)" />
+                                </div>
+                                <div class="col-lg-12">
+                                    <button type="submit" class="rle_btn">Post comment</button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <div class="sidebar_wrapper">
+                    <aside class="widget widget_search">
+                        <h4 class="widget-title">Search</h4>
+                        <div class="input-group">
+                            <input type="text" placeholder="Type keyword...">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button"><i class="fa fa-search"></i></button>
+                            </span>
+                        </div>
+                    </aside>
+
+                    <aside class="widget widget_categories" style="display:none">
+                        <h4 class="widget-title">Categories</h4>
+                        <ul>
+                            <li><a href="#">Real Estate</a></li>
+                            <li><a href="#">Luxury Housing</a></li>
+                            <li><a href="#">Paradise Mortagages</a></li>
+                            <li><a href="#">Christophe Harbour</a></li>
+                            <li><a href="#">Commerial Villa </a></li>
+                            <li><a href="#">Morden Apartment</a></li>
+                        </ul>
+                    </aside>
+
+                    <aside class="widget widget_recent_post">
+                        <h4 class="widget-title">Recent posts</h4>
+                        @{
+                            var recentPosts = new PropertyManagerWeb.Models.ApplicationDbContext().Blogs.OrderByDescending(c => c.DatePosted).Take(3).ToList();
+                            <ul>
+                                @foreach (var item in recentPosts)
+                                {
+                                    <li>
+                                        <a href="@Url.Action("BlogDetail", "Home", new { id = item.ID })"><img src="@Html.DisplayFor(modelItem => item.ImageUrl)" width="70" height="70" alt=" "></a>
+                                        <div class="rle_recent_post_info">
+                                            <p>@Html.DisplayFor(modelItem => item.Title)</p>
+                                            @{ DateTime postedDate2 = Convert.ToDateTime(item.DatePosted);}
+                                            <span>@String.Format("{0:dddd, MMMM d, yyyy}", postedDate2)</span>
+                                        </div>
+                                    </li>
+                                                }
+                            </ul>
+                        }
+                    </aside>
+
+                    <aside class="widget widget_tag_cloud">
+                        <h4 class="widget-title">Tags</h4>
+                        <a href="#">Housing,</a>
+                        <a href="#">luxury,</a>
+                        <a href="#">real estate,</a>
+                        <a href="#">homes,</a>
+                        <a href="#">modern villa,</a>
+                        <a href="#">apartments,</a>
+                        <a href="#">beach,</a>
+                        <a href="#">property,</a>
+                        <a href="#">business deplux,</a>
+                        <a href="#">globe,</a>
+                        <a href="#">money</a>
+                    </aside>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("http://tinymce.cachefly.net/4.0/tinymce.min.js")
+    <script>
+        tinymce.init({
+            selector: 'textarea',
+            //height: 500,
+            menubar: false,
+            plugins: [
+              'advlist autolink lists link image charmap print preview anchor',
+              'searchreplace visualblocks code fullscreen',
+              'insertdatetime media table contextmenu paste code'
+            ],
+            toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media | forecolor backcolor emoticons | codesample help',
+            //toolbar1: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+            //toolbar2: 'print preview media | forecolor backcolor emoticons | codesample help',
+
+            content_css: [
+              '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
+              '//www.tinymce.com/css/codepen.min.css']
+        });
+    </script>
+}
+
+<!--main js file start-->
+<script type="text/javascript" src="~/js/jquery.js"></script>
+<script type="text/javascript" src="~/js/bootstrap.js"></script>
+<script type="text/javascript" src="~/js/owl.carousel.js"></script>
+<script type="text/javascript" src="~/js/jquery-ui.js"></script>
+<script type="text/javascript" src="~/js/custom.js"></script>
+<!--main js file end-->

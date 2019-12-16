@@ -1,0 +1,391 @@
+﻿@model IEnumerable<PropertyManagerWeb.Models.Property>
+
+@{
+    ViewBag.Title = "Property Listing";
+}
+
+@helper buildLinks(int start, int end, string innerContent)
+{
+for (int i = start; i <= end; i++)
+{
+
+        <a style="color:@(i == ViewBag.Currentpage ? "white" : "")" class="@(i == ViewBag.Currentpage ? "active btn-info" : "")" href="@Url.Action("Property Listing", "Properties", new { page = i })">@(innerContent ?? i.ToString())</a>
+}
+}
+
+@helper pageLinks()
+{
+const int maxPages = 11;
+
+if (ViewBag.TotalPages <= maxPages)
+{
+        @buildLinks(1, (int)ViewBag.TotalPages, null)
+    return;
+}
+
+int pagesAfter = (Int16)ViewBag.TotalPages - ViewBag.CurrentPage; // Number of pages after current
+int pagesBefore = ViewBag.CurrentPage - 1; // Number of pages before current
+
+if (pagesAfter <= 4)
+{
+        @buildLinks(1, 1, null) // Show 1st page
+    int pageSubset = (Int16)ViewBag.TotalPages - maxPages - 1 > 1 ? (Int16)ViewBag.TotalPages - maxPages - 1 : 2;
+
+        @buildLinks(pageSubset, pageSubset, "...") // Show page subset (...)
+                                                @buildLinks((Int16)ViewBag.TotalPages - maxPages + 3, (Int16)ViewBag.TotalPages, null) // Show last pages
+    return; // Exit
+}
+
+if (pagesBefore <= 4)
+{
+        @buildLinks(1, maxPages - 2, null) // Show 1st pages
+    int pageSubset = maxPages + 2 < (Int16)ViewBag.TotalPages ? maxPages + 2 : (Int16)ViewBag.TotalPages - 1;
+
+        @buildLinks(pageSubset, pageSubset, "...") // Show page subset (...)
+                                                @buildLinks((Int16)ViewBag.TotalPages, (Int16)ViewBag.TotalPages, null) // Show last page
+    return; // Exit
+}
+
+if (pagesAfter > 4)
+{
+        @buildLinks(1, 1, null) // Show 1st pages
+    int pageSubset1 = ViewBag.CurrentPage - 7 > 1 ? ViewBag.CurrentPage - 7 : 2;
+    int pageSubset2 = ViewBag.CurrentPage + 7 < (Int16)ViewBag.TotalPages ? (Int16)ViewBag.CurrentPage + 7 : (Int16)ViewBag.TotalPages - 1;
+
+        @buildLinks(pageSubset1, pageSubset1, pageSubset1 == ViewBag.CurrentPage - 4 ? null : "...") // Show 1st page subset (...)
+                                                                                                    @buildLinks(ViewBag.CurrentPage - 3, ViewBag.CurrentPage + 3, null) // Show middle pages
+
+    // Show 2nd page subset (...)
+    // only show ... if page is contigous to the previous one.
+
+        @buildLinks(pageSubset2, pageSubset2, pageSubset2 == ViewBag.CurrentPage + 4 ? null : "...")
+        @buildLinks((Int16)ViewBag.TotalPages, (Int16)ViewBag.TotalPages, null) // Show last page
+    return; // Exit
+}
+}
+
+
+<style type="text/css">
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    #page-wrap {
+        width: 600px;
+        margin: 15px auto;
+    }
+
+    #sidebar ul {
+        background: #eee;
+        padding: 10px;
+    }
+
+    li {
+        margin: 0 0 0 20px;
+    }
+
+    #main {
+        float: left;
+    }
+
+    #sidebar-float {
+        /*float:right;*/
+    }
+</style>
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+        var offset = $("#sidebar-float").offset();
+        var topPadding = 15;
+        $(window).scroll(function () {
+            if ($(window).scrollTop() > offset.top) {
+                $("#sidebar-float").stop().animate({
+                    marginTop: $(window).scrollTop() - offset.top + topPadding
+                });
+            } else {
+                $("#sidebar-float").stop().animate({
+                    marginTop: 0
+                });
+            };
+        });
+    });
+</script>
+@*<script>
+        $.fn.followTo = function (pos) {
+            var $this = this,
+                $window = $(window);
+
+            $window.scroll(function (e) {
+                if ($window.scrollTop() > pos) {
+                    $this.css({
+                        position: 'absolute',
+                        top: pos
+                    });
+                } else {
+                    $this.css({
+                        position: 'fixed',
+                        top: 0
+                    });
+                }
+            });
+        };
+
+        $('#sidebar-float').followTo(1250);
+    </script>*@
+<script>
+    var windw = this;
+
+    $.fn.followTo = function (elem) {
+        var $this = this,
+            $window = $(windw),
+            $bumper = $(elem),
+            bumperPos = $bumper.offset().top,
+            thisHeight = $this.outerHeight(),
+            setPosition = function () {
+                if ($window.scrollTop() > (bumperPos - thisHeight)) {
+                    $this.css({
+                        position: 'absolute',
+                        top: (bumperPos - thisHeight)
+                    });
+                } else {
+                    $this.css({
+                        position: 'fixed',
+                        top: 0
+                    });
+                }
+            };
+        $window.resize(function () {
+            bumperPos = pos.offset().top;
+            thisHeight = $this.outerHeight();
+            setPosition();
+        });
+        $window.scroll(setPosition);
+        setPosition();
+    };
+
+    $('#one').followTo('#two');
+
+
+</script>
+<style>
+    #one {
+        width: 100%;
+        height: 20px;
+        background-color: aqua;
+        position: fixed;
+    }
+
+
+    #two {
+        width: 100%;
+        height: 50px;
+        background-color: red;
+        margin-top: 50px;
+        position: absolute;
+    }
+</style>
+<!-- Property Wrapper start -->
+<div class="rle_property_wrapper rle_bottompadder70">
+    <div class="container">
+        <div class="row">
+            <div class="clearfix"></div>
+            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                <div class="row">
+                    @foreach (var item in Model)
+                    {
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="rle_property_infobox">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                        <div class="rle_property_infobox_img">
+                                            <a href="@Url.Action("Details", "Properties", new { id = item.PropertyID, location = item.Location })"><img src="@Html.DisplayFor(modelItem => item.ImageMainUrl)" width="370" height="300" alt=" "></a>
+                                            <span>
+                                                <sup>₦</sup>@string.Format("{0:#,0.00}", item.RentAmount)
+                                                @if (item.Category == "For Rent")
+                                                {
+                                                    <sub style="text-transform:lowercase">p/y</sub>
+                                                }
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                        <div class="rle_property_infobox_details">
+                                            <div class="rle_property_infobox_details_header">
+                                                <ul>
+                                                    @if (item.Category.ToString() == "For Sale")
+                                                    {
+                                                        <li class="rle_red_clr">for sale</li>
+                                                    }
+                                                    else if (item.Category.ToString() == "For Rent")
+                                                    {
+                                                        <li class="rle_green_clr">for rent</li>
+                                                    }
+                                                    @if (item.Featured)
+                                                    {
+                                                        <li class="rle_black_clr">featured</li>
+                                                    }
+                                                </ul>
+                                                <h3><a href="@Url.Action("Details", "Properties", new { id = item.PropertyID, location = item.Location })">@Html.DisplayFor(modelItem => item.Name)</a></h3>
+                                                <p>@Html.DisplayFor(modelItem => item.Address)</p>
+                                                <span>@Html.DisplayFor(modelItem => item.PlainDescription).ToString().Substring(0, Math.Min(item.PlainDescription.Length, 100))...</span>
+                                            </div>
+                                            <div class="rle_property_infobox_details_footer">
+                                                @{
+                                                    Single m_Average = 0;
+
+                                                    Single m_totalNumberOfVotes = 0;
+                                                    Single m_totalVoteCount = 0;
+                                                    Single m_currentVotesCount = 0;
+                                                    Single m_inPercent = 0;
+                                                    var thisVote = string.Empty;
+
+                                                    if (item.Votes.Length > 0)
+                                                    {
+                                                        // calculate total votes now
+                                                        string[] votes = item.Votes.Split(',');
+                                                        for (int i = 0; i < votes.Length; i++)
+                                                        {
+                                                            m_currentVotesCount = int.Parse(votes[i]);
+                                                            m_totalNumberOfVotes = m_totalNumberOfVotes + m_currentVotesCount;
+                                                            m_totalVoteCount = m_totalVoteCount + (m_currentVotesCount * (i + 1));
+                                                        }
+
+                                                        m_Average = m_totalVoteCount / m_totalNumberOfVotes;
+                                                        m_inPercent = (m_Average * 100) / 5;
+                                                        string ms_inPercent = m_inPercent + "%";
+
+                                                        <p style="display: block; width: 100px; height: 20px; background: url(../images/whitestar.gif) 0 0;">
+                                                            <span style="display: block; width: @ms_inPercent; height: 20px; background: url(../images/yellowstar.gif) 0 -20px;">
+                                                            </span>
+                                                        </p>
+                                                    }
+                                                }
+                                                <div style="float:right;">
+                                                    <span><i style="color:deepskyblue" class="fa fa-bed" aria-hidden="true"></i> @Html.DisplayFor(modelItem => item.Beds).ToString().PadLeft(2, '0')</span>
+                                                    <span><i style="color:deepskyblue; margin-left:10px" class="fa fa-bath" aria-hidden="true"></i> @Html.DisplayFor(modelItem => item.Baths).ToString().PadLeft(2, '0')</span>
+                                                    <span><i style="color:deepskyblue; margin-left:10px" class="fa fa-taxi" aria-hidden="true"></i> @Html.DisplayFor(modelItem => item.ParkingLot)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                                                    }
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="rle_pagination_wrapper">
+                            <nav>
+
+                                @if (Model.Count() < 1)
+                                {
+                                    <div class="col-md-12" style="background-color:white; height:1300px">
+                                        <h5 style="text-align:center; margin-top:100px">Sorry, your search returned no result. </h5>
+                                    </div>
+                                }
+                                else
+                                {
+
+                                    int prevPage = int.Parse(ViewBag.CurrentPage.ToString()) - 1;
+                                    int nextPage = int.Parse(ViewBag.CurrentPage.ToString()) + 1;
+
+                                        <ul class="pagination">
+                                            <li style="display:@(prevPage == 0 ? "none" : "")"><a href="@Url.Action("Property Listing", "Properties", new { page = prevPage })"><i class="fa fa-angle-double-left" aria-hidden="true"></i></a></li>
+                                            <li>@pageLinks()</li>
+                                            <li style="display:@(ViewBag.CurrentPage == ViewBag.TotalPages ? "none" : "")"><a href="@Url.Action("Property Listing", "Properties", new { page = nextPage })"><i class="fa fa-angle-double-right" aria-hidden="true"></i></a></li>
+                                        </ul>
+                                }
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                <div class="sidebar_wrapper blog_sidebaar">
+                    <aside class="widget widget_search_property">
+                        @using (Html.BeginForm("Search", "Properties"))
+                        {
+                            <h4 class="widget-title">Search for property</h4>
+                            <div class="rle_searchform_box style_3">
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <select name="Category" style="">
+                                            <option value="For Rent">For Rent </option>
+                                            <option value="For Sale">For Sale</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <input style="" type="search" placeholder="Street, town & landmark">
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        @Html.DropDownList("Location", null, "Location", new { @id = "country12", @class = "frm-field required", @style = "" })
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        @Html.DropDownList("PropertyTypes", null, new { @id = "country12", @class = "frm-field required", @style = "" })
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        @Html.DropDownList("Beds", null, new { @id = "country19", @class = "frm-field required", @style = " width:100%; margin-bottom: 20px" })
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        @Html.DropDownList("Baths", null, new { @id = "country19", @class = "frm-field required", @style = " width:100%; margin-bottom: 20px" })
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <select name="parkingLot">
+                                            <option>Parking</option>
+                                            <option value="Yes">Yes </option>
+                                            <option value="No">No</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        @Html.DropDownList("MinPrice", null, "Min. Price", new { @id = "country19", @class = "frm-field required" })
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        @Html.DropDownList("MaxPrice", null, "Max. Price", new { @id = "country19", @class = "frm-field required" })
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <button type="submit" class="rle_btn">Search property</button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </aside>
+                    <aside class="widget widget_recent_post">
+                        <h4 class="widget-title">Featured property</h4>
+                        @{ 
+                            var featuredproperties = new PropertyManagerWeb.Models.ApplicationDbContext().Properties.Where(c => c.Featured == true).Take(3).ToList();
+                            <ul>
+                            @foreach(var item in featuredproperties)
+                            {
+                            <li>
+                                <a href="@Url.Action("Details", "Properties", new { id = item.PropertyID, location = item.Location })"><img src="@Html.DisplayFor(modelItem => item.ImageMainUrl)" width="70" height="70" alt=" "></a>
+                                <div class="rle_recent_post_info">
+                                    <p>@Html.DisplayFor(modelItem => item.Name)</p>
+                                    <span>@Html.DisplayFor(modelItem => item.Address)</span>
+                                    <h6><sup>₦</sup>@string.Format("{0:#,0.00}", item.RentAmount)</h6>
+                                </div>
+                            </li>
+                                }
+                        </ul>
+                            }
+                    </aside>
+
+                    <aside class="widget widget_location">
+                        <h4 class="widget-title">Location of property</h4>
+                        <ul>
+                            <li><a href="@Url.Action("SearchLocation", "Properties", new { loc = "Awka" })"><i class="fa fa-angle-double-right" aria-hidden="true"></i>Awka</a></li>
+                            <li><a href="@Url.Action("SearchLocation", "Properties", new { loc = "Onitsha" })"><i class="fa fa-angle-double-right" aria-hidden="true"></i>Onitsha</a></li>
+                            <li><a href="@Url.Action("SearchLocation", "Properties", new { loc = "Nnewi" })"><i class="fa fa-angle-double-right" aria-hidden="true"></i>Nnewi</a></li>
+                            <li><a href="@Url.Action("SearchLocation", "Properties", new { loc = "Ihiala" })"><i class="fa fa-angle-double-right" aria-hidden="true"></i>Ihiala</a></li>
+                            <li><a href="@Url.Action("SearchLocation", "Properties", new { loc = "Nkpor" })"><i class="fa fa-angle-double-right" aria-hidden="true"></i>Nkpor</a></li>
+                            <li><a href="@Url.Action("SearchLocation", "Properties", new { loc = "Aguleri" })"><i class="fa fa-angle-double-right" aria-hidden="true"></i>Aguleri</a></li>
+                            <li><a href="@Url.Action("SearchLocation", "Properties", new { loc = "Ogbunike" })"><i class="fa fa-angle-double-right" aria-hidden="true"></i>Ogbunike</a></li>
+                            <li><a href="@Url.Action("SearchLocation", "Properties", new { loc = "Achina" })"><i class="fa fa-angle-double-right" aria-hidden="true"></i>Achina</a></li>
+                        </ul>
+                    </aside>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@*@section Scripts {
+    }*@
